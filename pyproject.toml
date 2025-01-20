@@ -1,0 +1,20 @@
+[project]
+name = "css-project"
+version = "0.1.0"
+description = "Complex Systems Simulation course group project."
+readme = "README.md"
+authors = [
+    { name = "Henry Zwart", email = "henrybzwart@gmail.com" },
+    { name = "Lisa Pijpers", email = "lisa.pijpers@student.uva.nl" },
+    { name = "Petr Chalupsky", email = "chalupskypetr22@gmail.com" },
+    { name = "Frederieke Loth", email = "frederiekeloth@gmail.com" },
+]
+requires-python = ">=3.12"
+dependencies = []
+
+[project.scripts]
+css-project = "css_project:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
