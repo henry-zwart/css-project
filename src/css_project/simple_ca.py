@@ -60,3 +60,14 @@ class GameOfLife:
                         temp_grid[y, x] = 1
 
         self.grid = temp_grid
+
+    def total_alive(self):
+        """Counts total number of alive cells in the grid."""
+        alive = 0
+
+        for y in range(self.width):
+            for x in range(self.width):
+                if self.grid[y, x] == 1:
+                    alive += 1
+
+        return alive
