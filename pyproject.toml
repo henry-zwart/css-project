@@ -10,7 +10,9 @@ authors = [
     { name = "Frederieke Loth", email = "frederiekeloth@gmail.com" },
 ]
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "numpy>=2.2.2",
+]
 
 [project.scripts]
 css-project = "css_project:main"
