@@ -9,9 +9,33 @@ class FineGrained:
     N_STATES = 2
 
     grid: np.ndarray
+    nutrients: np.ndarray
 
-    def __init__(self, width: int = 128):
-        self.grid = np.zeros((width, width), dtype=int)
+    def __init__(
+        self,
+        width: int = 128,
+        nutrient_level: float = 1.0,
+        nutrient_consume_rate: float = 0.1,
+    ):
+        if not (0.0 <= nutrient_level <= 1.0):
+            raise ValueError(
+                f"Global nutrient level must be in range: [0, 1], "
+                f"found {nutrient_level}."
+            )
+        if not (0.0 <= nutrient_consume_rate <= 1.0):
+            raise ValueError(
+                f"Nutrient consumption rate must be in range: [0, 1], "
+                f"found {nutrient_consume_rate}."
+            )
+        elif nutrient_consume_rate > nutrient_level:
+            raise ValueError(
+                f"Nutrient consumption rate must not exceed global nutrient level, "
+                f"found {nutrient_consume_rate} > {nutrient_level}."
+            )
+        self.grid = np.zeros((width, width), dtype=np.int64)
+        self.nutrients = np.zeros_like(self.grid, dtype=np.float64) + nutrient_level
+        self.nutrient_level = nutrient_level
+        self.nutrient_consume_rate = nutrient_consume_rate
         self.width = width
 
     def initial_grid(self, p: float):
@@ -20,12 +44,17 @@ class FineGrained:
         self.grid = np.where(random_matrix < p, 1, 0)
 
     def update(self):
-        """Update grid state according to transition rules."""
+        """Update grid state according to transition rules.
+
+        First occupy new cells. Then consume nutrients.
+        """
         n_occupied = count_neighbours(self.grid)
         self.grid[np.where(n_occupied >= 3)] = 1
+        self.nutrients[np.where(self.grid)] -= self.nutrient_consume_rate
+        self.grid[np.where(self.nutrients < self.nutrient_consume_rate)] = 0
 
 
-def count_neighbours(grid: np.ndarray) -> np.ndarray:
+def count_neighbours(states: np.ndarray) -> np.ndarray:
     """Count the neighbours of each cell in a grid.
 
     If the input array is 2D, assumed to be the binary states
@@ -40,17 +69,17 @@ def count_neighbours(grid: np.ndarray) -> np.ndarray:
     cell. In the 3D case, separates these counts by species,
     returning a matrix of the same shape as the input array.
     """
-    match grid.ndim:
+    match states.ndim:
         case 2:
             return signal.convolve2d(
-                grid,
+                states,
                 KERNEL_NEIGHBOUR_COUNT,
                 mode="same",
                 boundary="fill",
             )
         case 3:
             return signal.convolve(
-                grid,
+                states,
                 KERNEL_NEIGHBOUR_COUNT_3D,
                 mode="same",
             )
