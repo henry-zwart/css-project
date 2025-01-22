@@ -11,11 +11,11 @@ if __name__ == "__main__":
 
     t = 0
     total_cells = width * width
-    alive = [game_of_life.alive()]
+    alive = [game_of_life.total_alive()]
 
     while t < 10:
         game_of_life.update()
-        alive.append(game_of_life.alive())
+        alive.append(game_of_life.total_alive())
         t += 1
 
     fig, ax = plot_grid(game_of_life)
