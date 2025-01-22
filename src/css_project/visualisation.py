@@ -5,12 +5,12 @@ import matplotlib.pyplot as plt
 from .simple_ca import GameOfLife
 
 QUALITATIVE_COLOURS = [
+    "#CCBB44",
+    "#228833",
     "#FFFFFF",
     "#4477AA",
     "#AA3377",
-    "#228833",
     "#66CCEE",
-    "#CCBB44",
     "#EE6677",
 ]
 

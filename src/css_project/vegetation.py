@@ -2,11 +2,24 @@ import numpy as np
 
 
 class Vegetation:
+    N_STATES = 2
+
     grid: np.ndarray
 
-    def __init__(self, width: int = 128):
+    def __init__(
+        self,
+        width: int = 128,
+        small_radius: int = 1,
+        large_radius: int = 4,
+        positive_factor: int = 8,
+        negative_factor: int = 1,
+    ):
         self.grid = np.zeros((width, width), dtype=int)
         self.width = width
+        self.small_radius = small_radius
+        self.large_radius = large_radius
+        self.positive_factor = positive_factor
+        self.negative_factor = negative_factor
 
     def initial_grid(self, p):
         random_matrix = np.random.random(self.grid.shape)
@@ -14,10 +27,12 @@ class Vegetation:
 
     def find_close_neighbors(self, x, y):
         indexes = []
-        for delta_y in range(-1, 2):
+        left = -1 * self.small_radius
+        right = self.small_radius + 1
+        for delta_y in range(left, right):
             if y + delta_y < 0 or y + delta_y > self.width - 1:
                 continue
-            for delta_x in range(-1, 2):
+            for delta_x in range(left, right):
                 if x + delta_x < 0 or x + delta_x > self.width - 1:
                     continue
                 if delta_x == 0 and delta_y == 0:
@@ -27,10 +42,12 @@ class Vegetation:
 
     def find_far_neighbors(self, x, y):
         indexes = []
-        for delta_y in range(-5, 6):
+        left = -1 * self.large_radius
+        right = self.large_radius + 1
+        for delta_y in range(left, right):
             if y + delta_y < 0 or y + delta_y > self.width - 1:
                 continue
-            for delta_x in range(-5, 6):
+            for delta_x in range(left, right):
                 if x + delta_x < 0 or x + delta_x > self.width - 1:
                     continue
                 if delta_x == 0 and delta_y == 0:
@@ -62,7 +79,9 @@ class Vegetation:
                 far_sum = self.find_states(far)
 
                 # Calculate positive and negative feedback
-                feedback = 2 * close_sum - 3 * far_sum
+                feedback = (
+                    self.positive_factor * close_sum - self.negative_factor * far_sum
+                )
 
                 # Add either -1, 0 or 1 to current state
                 temp_grid[y, x] = self.grid[y, x] + max(-1, min(1, int(feedback)))
