@@ -1,5 +1,6 @@
 import numpy as np
 
+np.random.seed(1)
 
 class Vegetation:
     N_STATES = 2
