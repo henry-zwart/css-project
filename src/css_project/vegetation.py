@@ -172,8 +172,8 @@ class InvasiveVegetation:
         """p_nat and p_inv should be percentile regions for
         which something occurs. Example:
         0.0 - 0.5: 0
-        0.5 - 0.75: 1
-        0.75 - 1.0: 2
+        0.5 - 0.75: 1 (native)
+        0.75 - 1.0: 2 (invasive)
         """
 
         # Assume p_nat is the lowest
@@ -202,9 +202,11 @@ class InvasiveVegetation:
         return indexes
 
     def find_far_neighbors(self, x, y):
+        """far = negative"""
         indexes = []
         left = -1 * self.large_radius
         right = self.large_radius + 1
+
         for delta_y in range(left, right):
             if y + delta_y < 0 or y + delta_y > self.width - 1:
                 continue
@@ -214,17 +216,22 @@ class InvasiveVegetation:
                 if delta_x == 0 and delta_y == 0:
                     continue
                 indexes.append([x + delta_x, y + delta_y])
+
         return indexes
 
     def find_states(self, neighbors):
-        alive = 0
+        """return number of 1 and 2's"""
+        native = 0
+        invasive = 0
 
         # Sums up all 'alive' neighbors
         for row, column in neighbors:
-            # print(self.grid[x, y])
-            alive += self.grid[row, column]
+            if self.grid[row, column] == 1:
+                native += self.grid[row, column]
+            elif self.grid[row, column] == 2:
+                invasive += self.grid[row, column]
 
-        return alive
+        return native, invasive
 
     def update(self):
         temp_grid = np.empty_like(self.grid)
