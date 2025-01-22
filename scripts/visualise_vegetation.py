@@ -1,6 +1,7 @@
+import matplotlib.pyplot as plt
+
 from css_project.vegetation import Vegetation
 from css_project.visualisation import animate_ca, plot_grid
-import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
     width = 64
