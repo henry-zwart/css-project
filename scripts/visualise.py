@@ -1,5 +1,5 @@
 from css_project.simple_ca import GameOfLife
-from css_project.visualisation import plot_grid
+from css_project.visualisation import animate_ca, plot_grid
 
 if __name__ == "__main__":
     width = 64
@@ -22,3 +22,7 @@ if __name__ == "__main__":
     fig.savefig("test_grid_after.png", dpi=300)
 
     # Plot ratio of alive vs dead cells
+    game_of_life = GameOfLife(128)
+    game_of_life.initial_grid(p=0.5)
+    ani = animate_ca(game_of_life, 30)
+    ani.save("game_of_life.mp4")

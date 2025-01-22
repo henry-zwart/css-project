@@ -2,6 +2,8 @@ import numpy as np
 
 
 class GameOfLife:
+    N_STATES = 2
+
     grid: np.ndarray
 
     def __init__(self, width: int = 128):
