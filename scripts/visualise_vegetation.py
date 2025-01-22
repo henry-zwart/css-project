@@ -4,14 +4,14 @@ from css_project.vegetation import Vegetation
 from css_project.visualisation import animate_ca, plot_grid
 
 if __name__ == "__main__":
-    width = 64
+    width = 128
 
     vegetation = Vegetation(width)
     vegetation.initial_grid(p=0.5)
 
     initial_grid = vegetation.grid.copy()
 
-    ani = animate_ca(vegetation, 10)
+    ani = animate_ca(vegetation, 40)
     ani.save("vegetation.gif")
 
     vegetation.grid = initial_grid.copy()
@@ -23,12 +23,11 @@ if __name__ == "__main__":
     total_cells = width * width
     alive = [vegetation.total_alive() / total_cells]
 
-    while t < 10:
+    while t < 40:
         vegetation.update()
         alive.append(vegetation.total_alive() / total_cells)
         t += 1
 
-    print(vegetation.total_alive())
     fig, ax = plot_grid(vegetation)
     fig.savefig("veg_grid_after.png", dpi=300)
 
