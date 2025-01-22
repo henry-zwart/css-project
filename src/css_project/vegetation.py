@@ -24,7 +24,7 @@ class Vegetation:
                     continue
                 indexes.append([x + delta_x, y + delta_y])
         return indexes
-    
+
     def find_far_neighbors(self, x, y):
         indexes = []
         for delta_y in range(-5, 6):
