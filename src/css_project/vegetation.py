@@ -154,20 +154,23 @@ class InvasiveVegetation:
         width: int = 128,
         small_radius: int = 1,
         large_radius: int = 4,
-        positive_factor: int = 8,
-        negative_factor: int = 1,
+        pos_factor_nat: int = 8,
+        neg_factor_nat: int = 1,
+        pos_factor_inv: int = 8,
+        neg_factor_inv: int = 1,
     ):
         self.grid = np.zeros((width, width), dtype=int)
         self.width = width
         self.small_radius = small_radius
         self.large_radius = large_radius
-        self.positive_factor_native = positive_factor
-        self.positive_factor_invasive = positive_factor
-        self.negative_factor = negative_factor
+        self.pos_factor_nat = pos_factor_nat
+        self.neg_factor_nat = neg_factor_nat
+        self.pos_factor_inv = pos_factor_inv
+        self.neg_factor_inv = neg_factor_inv
 
     def initial_grid(self, p_nat=0.5, p_inv=0.75):
-        """P_none, p_inv and p_nat should be percentile regions for
-        which something occurs:
+        """p_nat and p_inv should be percentile regions for
+        which something occurs. Example:
         0.0 - 0.5: 0
         0.5 - 0.75: 1
         0.75 - 1.0: 2
@@ -178,12 +181,14 @@ class InvasiveVegetation:
         self.grid[np.where(random_matrix < p_nat)] = 0
         self.grid[np.where((random_matrix >= p_nat) & (random_matrix < p_inv))] = 1
         self.grid[np.where(random_matrix >= p_inv)] = 2
-        print(self.grid)
 
     def find_close_neighbors(self, x, y):
+        """Positive = close"""
         indexes = []
+
         left = -1 * self.small_radius
         right = self.small_radius + 1
+
         for delta_y in range(left, right):
             if y + delta_y < 0 or y + delta_y > self.width - 1:
                 continue
@@ -193,6 +198,7 @@ class InvasiveVegetation:
                 if delta_x == 0 and delta_y == 0:
                     continue
                 indexes.append([x + delta_x, y + delta_y])
+
         return indexes
 
     def find_far_neighbors(self, x, y):
