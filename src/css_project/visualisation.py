@@ -1,6 +1,7 @@
 import matplotlib.animation as animation
 import matplotlib.colors as mpc
 import matplotlib.pyplot as plt
+import numpy as np
 
 from .simple_ca import GameOfLife
 
@@ -23,9 +24,12 @@ def plot_grid(ca: GameOfLife):
     """
     fig, ax = plt.subplots(figsize=(6.5, 6.5), layout="constrained")
     ax.set_axis_off()
+    palette = mpc.ListedColormap(
+        [QUALITATIVE_COLOURS[i] for i in sorted(np.unique(ca.grid))]
+    )
     im_ax = ax.imshow(
         ca.grid,
-        cmap=mpc.ListedColormap(QUALITATIVE_COLOURS[: ca.N_STATES]),
+        cmap=palette,
     )
     return fig, im_ax
 
