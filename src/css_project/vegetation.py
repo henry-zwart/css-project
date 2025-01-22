@@ -229,7 +229,7 @@ class InvasiveVegetation:
             if self.grid[row, column] == 1:
                 native += self.grid[row, column]
             elif self.grid[row, column] == 2:
-                invasive += self.grid[row, column]
+                invasive += min(self.grid[row, column], 1)
 
         return native, invasive
 
@@ -240,35 +240,61 @@ class InvasiveVegetation:
             for x in range(self.width):
                 # Find local neighbors and calculate sum
                 close = self.find_close_neighbors(y, x)
-                close_sum = self.find_states(close)
+                close_nat, close_inv = self.find_states(close)
+                # close_sum = self.find_states(close)
 
                 # Find non-local neighbors and calculate sum
                 far = self.find_far_neighbors(y, x)
-                far_sum = self.find_states(far)
+                far_nat, far_inv = self.find_states(far)
 
                 # Calculate positive and negative feedback
-                feedback = (
-                    self.positive_factor * close_sum - self.negative_factor * far_sum
+                feedback_nat = self.pos_factor_nat * close_nat - (
+                    (self.neg_factor_nat * far_nat) + (self.neg_factor_inv * far_inv)
                 )
 
-                # Add either -1, 0 or 1 to current state
-                temp_grid[y, x] = self.grid[y, x] + max(-1, min(1, int(feedback)))
+                feedback_inv = self.pos_factor_inv * close_inv - (
+                    (self.neg_factor_nat * far_nat) + (self.neg_factor_inv * far_inv)
+                )
 
-                # Ensure minimum/maximum possible values
-                if temp_grid[y, x] < 0:
-                    temp_grid[y, x] = 0
-                if temp_grid[y, x] > 1:
-                    temp_grid[y, x] = 1
+                # Empty cell
+                if self.grid[y, x] == 0:
+                    if feedback_nat == feedback_inv and feedback_nat > 0:
+                        temp_grid[y, x] = np.random.choice((1, 2))
+                    elif feedback_nat > 0 and feedback_nat > feedback_inv:
+                        temp_grid[y, x] = 1
+                    elif feedback_inv > 0 and feedback_inv > feedback_nat:
+                        temp_grid[y, x] = 2
+                    else:
+                        temp_grid[y, x] = 0
+
+                # Native cell
+                elif self.grid[y, x] == 1:
+                    # Cell dies
+                    if feedback_nat < 0:
+                        temp_grid[y, x] = 0
+                    else:
+                        temp_grid[y, x] = 1
+
+                # Invasive cell
+                elif self.grid[y, x] == 2:
+                    # Cell dies
+                    if feedback_inv < 0:
+                        temp_grid[y, x] = 0
+                    else:
+                        temp_grid[y, x] = 2
 
         self.grid = temp_grid
 
     def total_alive(self):
         """Counts total number of alive cells in the grid."""
-        alive = 0
+        alive_nat = 0
+        alive_inv = 0
 
         for y in range(self.width):
             for x in range(self.width):
                 if self.grid[y, x] == 1:
-                    alive += 1
+                    alive_nat += 1
+                elif self.grid[y, x] == 2:
+                    alive_inv += 1
 
-        return alive
+        return alive_nat, alive_inv
