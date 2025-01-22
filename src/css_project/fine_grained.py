@@ -7,6 +7,7 @@ KERNEL_NEIGHBOUR_COUNT_3D = KERNEL_NEIGHBOUR_COUNT[None, ...]
 
 class FineGrained:
     N_STATES = 2
+    N_NEIGHBOURS = 8
 
     grid: np.ndarray
     nutrients: np.ndarray
@@ -16,6 +17,7 @@ class FineGrained:
         width: int = 128,
         nutrient_level: float = 1.0,
         nutrient_consume_rate: float = 0.1,
+        nutrient_diffusion_rate: float = 0.1,
     ):
         if not (0.0 <= nutrient_level <= 1.0):
             raise ValueError(
@@ -33,10 +35,17 @@ class FineGrained:
                 f"found {nutrient_consume_rate} > {nutrient_level}."
             )
         self.grid = np.zeros((width, width), dtype=np.int64)
+        self.width = width
         self.nutrients = np.zeros_like(self.grid, dtype=np.float64) + nutrient_level
         self.nutrient_level = nutrient_level
         self.nutrient_consume_rate = nutrient_consume_rate
-        self.width = width
+
+        self.nutrient_diffusion_kernel = np.full(
+            (3, 3),
+            fill_value=nutrient_diffusion_rate / self.N_NEIGHBOURS,
+            dtype=np.float64,
+        )
+        self.nutrient_diffusion_kernel[1, 1] = 1 - nutrient_diffusion_rate
 
     def initial_grid(self, p: float):
         """Randomly initialise grid with occupation probability p."""
@@ -52,6 +61,16 @@ class FineGrained:
         self.grid[np.where(n_occupied >= 3)] = 1
         self.nutrients[np.where(self.grid)] -= self.nutrient_consume_rate
         self.grid[np.where(self.nutrients < self.nutrient_consume_rate)] = 0
+        self.diffuse_nutrients()
+
+    def diffuse_nutrients(self):
+        total_nutrients_before = self.nutrients.sum()
+        self.nutrients = signal.convolve2d(
+            self.nutrients, self.nutrient_diffusion_kernel, mode="same", boundary="fill"
+        )
+        total_nutrients_after = self.nutrients.sum()
+        nutrients_lost = total_nutrients_before - total_nutrients_after
+        self.nutrients += nutrients_lost / self.width**2
 
 
 def count_neighbours(states: np.ndarray) -> np.ndarray:
