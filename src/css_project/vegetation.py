@@ -69,16 +69,18 @@ class Vegetation:
 
     def total_alive(self):
         """Counts total number of alive cells in the grid."""
-        alive = 0
 
-        for y in range(self.width):
-            for x in range(self.width):
-                if self.grid[y, x] == 1:
-                    alive += 1
+        alive = self.grid.sum()
 
         return alive
 
     def is_steady_state(self):
+        """Checks whether a steady state is reached using first order and second
+        order difference"""
+
+        # Selects 21 last iterations to look at a trend instead of local fluctuation
+        # and the index of the middle term of second difference was
+        # a whole integer
         if (len(self.proportion_alive_list)) > 21:
             der = self.proportion_alive_list[-21] - self.proportion_alive_list[-1]
             der_2 = (

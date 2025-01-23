@@ -1,8 +1,11 @@
+"""Find the steady state and visualize the proportion of alive cells at the moment"""
+
 import matplotlib.pyplot as plt
 
 from css_project.vegetation import Vegetation
 
 # from css_project.visualisation import animate_ca, plot_grid
+
 
 width = 64
 vegetation = Vegetation(width)
