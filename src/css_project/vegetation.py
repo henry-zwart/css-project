@@ -30,23 +30,14 @@ class Vegetation:
         self.grid = np.where(random_matrix < p, 1, 0)
 
     def find_neighbors(self, x, y, radius):
-        """Positive = close
-        Negative = far"""
-        indexes = []
-
-        left = -1 * radius
-        right = radius + 1
-
-        for delta_y in range(left, right):
-            if y + delta_y < 0 or y + delta_y > self.width - 1:
-                continue
-            for delta_x in range(left, right):
-                if x + delta_x < 0 or x + delta_x > self.width - 1:
-                    continue
-                if delta_x == 0 and delta_y == 0:
-                    continue
-                indexes.append([x + delta_x, y + delta_y])
-
+        indexes = [
+            [x + dx, y + dy]
+            for dx in range(-radius, radius + 1)
+            for dy in range(-radius, radius + 1)
+            if (dx != 0 or dy != 0)
+            and 0 <= x + dx < self.width
+            and 0 <= y + dy < self.width
+        ]
         return indexes
 
     def find_states(self, neighbors):
@@ -120,17 +111,6 @@ class Vegetation:
 
         self.grid = temp_grid
         self.proportion_alive_list.append(self.total_alive() / self.area)
-
-    def total_alive(self):
-        """Counts total number of alive cells in the grid."""
-        alive = 0
-
-        for y in range(self.width):
-            for x in range(self.width):
-                if self.grid[y, x] == 1:
-                    alive += 1
-
-        return alive
 
 
 class InvasiveVegetation:

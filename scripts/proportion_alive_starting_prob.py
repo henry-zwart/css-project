@@ -1,3 +1,6 @@
+import cProfile
+import pstats
+
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.pyplot import cm
@@ -22,20 +25,25 @@ p_list = [
     0.1,
 ]
 
-p_list = np.logspace(start=-4, stop=0, num=100, base=10)
+p_list = np.logspace(start=-4, stop=0, num=3, base=10)
 print(p_list)
 width = 64
 
 iterations_list = []
 alive_list = []
+with cProfile.Profile() as profile:
+    for p in tqdm(p_list):
+        vegetation = Vegetation(width)
+        vegetation.initial_grid(p)
+        Vegetation.find_steady_state(vegetation, 1000)
+        iterations = list(range(len(vegetation.proportion_alive_list)))
+        alive_list.append(vegetation.proportion_alive_list)
+        iterations_list.append(iterations)
 
-for p in tqdm(p_list):
-    vegetation = Vegetation(width)
-    vegetation.initial_grid(p)
-    Vegetation.find_steady_state(vegetation, 1000)
-    iterations = list(range(len(vegetation.proportion_alive_list)))
-    alive_list.append(vegetation.proportion_alive_list)
-    iterations_list.append(iterations)
+results = pstats.Stats(profile)
+results.sort_stats(pstats.SortKey.TIME)
+results.print_stats()
+results.dump_stats("results.prof")
 
 
 plt.figure(figsize=(8, 6))
