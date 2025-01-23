@@ -2,8 +2,7 @@ import numpy as np
 from numpy.random import default_rng
 from scipy import signal
 
-KERNEL_NEIGHBOUR_COUNT = np.array([[1, 1, 1], [1, 0, 1], [1, 1, 1]], dtype=np.int64)
-KERNEL_NEIGHBOUR_COUNT_3D = KERNEL_NEIGHBOUR_COUNT[None, ...]
+from . import kernel
 
 
 class FineGrained:
@@ -40,13 +39,9 @@ class FineGrained:
         self.nutrients = np.zeros_like(self.grid, dtype=np.float64) + nutrient_level
         self.nutrient_level = nutrient_level
         self.nutrient_consume_rate = nutrient_consume_rate
-
-        self.nutrient_diffusion_kernel = np.full(
-            (3, 3),
-            fill_value=nutrient_diffusion_rate / self.N_NEIGHBOURS,
-            dtype=np.float64,
+        self.nutrient_diffusion_kernel = kernel.nutrient_diffusion_kernel(
+            nutrient_diffusion_rate
         )
-        self.nutrient_diffusion_kernel[1, 1] = 1 - nutrient_diffusion_rate
 
     def initial_grid(self, p: float):
         """Randomly initialise grid with occupation probability p."""
@@ -104,14 +99,14 @@ def count_neighbours(states: np.ndarray) -> np.ndarray:
         case 2:
             return signal.convolve2d(
                 states,
-                KERNEL_NEIGHBOUR_COUNT,
+                kernel.NEIGHBOUR_COUNT,
                 mode="same",
                 boundary="fill",
             )
         case 3:
             return signal.convolve(
                 states,
-                KERNEL_NEIGHBOUR_COUNT_3D,
+                kernel.NEIGHBOUR_COUNT_3D,
                 mode="same",
             )
         case _:
