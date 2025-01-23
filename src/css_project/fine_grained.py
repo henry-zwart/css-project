@@ -21,15 +21,13 @@ class FineGrained:
         nutrient_diffusion_rate: float = 0.1,
         random_seed: int | None = 42,
     ):
-        if not (0.0 <= nutrient_level <= 1.0):
+        if any(
+            x < 0.0
+            for x in (nutrient_level, nutrient_consume_rate, nutrient_diffusion_rate)
+        ):
             raise ValueError(
-                f"Global nutrient level must be in range: [0, 1], "
-                f"found {nutrient_level}."
-            )
-        if not (0.0 <= nutrient_consume_rate <= 1.0):
-            raise ValueError(
-                f"Nutrient consumption rate must be in range: [0, 1], "
-                f"found {nutrient_consume_rate}."
+                "Global nutrient level, nutrient consumption rate, and "
+                "nutrient diffusion rate must all be non-negative."
             )
         elif nutrient_consume_rate > nutrient_level:
             raise ValueError(
