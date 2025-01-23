@@ -56,12 +56,23 @@ class FineGrained:
     def update(self):
         """Update grid state according to transition rules.
 
-        First occupy new cells. Then consume nutrients.
+        Order of operations:
+        1. Consume nutrients. If nutrient level insufficient --> die.
+        2. Vegetation spreads to nearby cells.
+        3. Diffuse nutrients.
         """
+
+        # Consume nutrients. If nutrients become negative, plant dies.
+        self.nutrients[np.where(self.grid)] -= self.nutrient_consume_rate
+        insufficient_nutrients = self.nutrients < 0
+        self.nutrients[insufficient_nutrients] = 0
+        self.grid[insufficient_nutrients] = 0
+
+        # Spread vegetation to nearby cells
         n_occupied = count_neighbours(self.grid)
         self.grid[np.where(n_occupied >= 3)] = 1
-        self.nutrients[np.where(self.grid)] -= self.nutrient_consume_rate
-        self.grid[np.where(self.nutrients < self.nutrient_consume_rate)] = 0
+
+        # Diffuse nutrients
         self.diffuse_nutrients()
 
     def diffuse_nutrients(self):
