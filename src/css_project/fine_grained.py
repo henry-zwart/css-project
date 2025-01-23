@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.random import default_rng
 from scipy import signal
 
 KERNEL_NEIGHBOUR_COUNT = np.array([[1, 1, 1], [1, 0, 1], [1, 1, 1]], dtype=np.int64)
@@ -18,6 +19,7 @@ class FineGrained:
         nutrient_level: float = 1.0,
         nutrient_consume_rate: float = 0.1,
         nutrient_diffusion_rate: float = 0.1,
+        random_seed: int | None = 42,
     ):
         if not (0.0 <= nutrient_level <= 1.0):
             raise ValueError(
@@ -34,6 +36,7 @@ class FineGrained:
                 f"Nutrient consumption rate must not exceed global nutrient level, "
                 f"found {nutrient_consume_rate} > {nutrient_level}."
             )
+        self.rng = default_rng(random_seed)
         self.grid = np.zeros((width, width), dtype=np.int64)
         self.width = width
         self.nutrients = np.zeros_like(self.grid, dtype=np.float64) + nutrient_level
@@ -49,7 +52,7 @@ class FineGrained:
 
     def initial_grid(self, p: float):
         """Randomly initialise grid with occupation probability p."""
-        random_matrix = np.random.random(self.grid.shape)
+        random_matrix = self.rng.random(self.grid.shape)
         self.grid = np.where(random_matrix < p, 1, 0)
 
     def update(self):
