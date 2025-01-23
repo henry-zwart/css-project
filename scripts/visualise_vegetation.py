@@ -11,7 +11,7 @@ if __name__ == "__main__":
 
     initial_grid = vegetation.grid.copy()
 
-    ani = animate_ca(vegetation, 40)
+    ani = animate_ca(vegetation, 10)
     ani.save("vegetation.gif")
 
     vegetation.grid = initial_grid.copy()
@@ -23,7 +23,7 @@ if __name__ == "__main__":
     total_cells = width * width
     alive = [vegetation.total_alive() / total_cells]
 
-    while t < 40:
+    while t < 10:
         vegetation.update()
         alive.append(vegetation.total_alive() / total_cells)
         t += 1

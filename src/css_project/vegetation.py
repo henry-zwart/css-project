@@ -13,7 +13,7 @@ class Vegetation:
         width: int = 128,
         small_radius: int = 1,
         large_radius: int = 4,
-        positive_factor: int = 0,
+        positive_factor: int = 8,
         negative_factor: int = 1,
     ):
         self.grid = np.zeros((width, width), dtype=int)

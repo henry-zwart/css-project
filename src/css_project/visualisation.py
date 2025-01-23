@@ -45,9 +45,12 @@ def animate_ca(ca: GameOfLife, steps: int, fps: int = 5):
     """
     fig, ax = plot_grid(ca)
 
-    def update_plot(_):
-        ca.update()
-        ax.set_data(ca.grid)
+    def update_plot(frame):
+        if frame == 0:
+            ax.set_data(ca.grid)
+        else:
+            ca.update()
+            ax.set_data(ca.grid)
         return [ax]
 
     ani = animation.FuncAnimation(
