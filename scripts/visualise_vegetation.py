@@ -5,7 +5,7 @@ from css_project.visualisation import animate_ca, plot_grid
 
 if __name__ == "__main__":
     width = 128
-    timespan = 40
+    timespan = 100
 
     # This code runs without invasive species
     """vegetation = Vegetation(width)
@@ -58,14 +58,14 @@ if __name__ == "__main__":
     alive_nat = []
     alive_inv = []
     alive_n, alive_i = vegetation.total_alive()
-    alive_nat.append(alive_n)
-    alive_inv.append(alive_i)
+    alive_nat.append(alive_n / total_cells)
+    alive_inv.append(alive_i / total_cells)
 
     while t < timespan:
         vegetation.update()
         alive_n, alive_i = vegetation.total_alive()
-        alive_nat.append(alive_n)
-        alive_inv.append(alive_i)
+        alive_nat.append(alive_n / total_cells)
+        alive_inv.append(alive_i / total_cells)
         t += 1
 
     fig, ax = plot_grid(vegetation)
@@ -73,12 +73,14 @@ if __name__ == "__main__":
 
     # Reset grid to initial state
     vegetation.grid = initial_grid.copy()
+
+    # Make animation of grid
     ani = animate_ca(vegetation, timespan)
     ani.save("vegetation.gif")
 
+    # Plot ratio of dead, native, and invasive cells
     iterations = list(range(len(alive_nat)))
 
-    # Plot ratio of dead, native, and invasive cells
     plt.figure(figsize=(8, 6))
     plt.plot(iterations, alive_nat, linestyle="-", label="Native Species")
     plt.plot(iterations, alive_inv, linestyle="-", label="Invasive Species")
