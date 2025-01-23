@@ -1,5 +1,7 @@
 # Group project for Complex System Simulation
 
+[![Tests](https://github.com/henry-zwart/css-project/actions/workflows/test.yml/badge.svg)](https://github.com/henry-zwart/css-project/actions/workflows/test.yml)
+
 ## Development - Getting started
 
 This repository uses _uv_ to manage Python and its dependencies, and _pre-commit_ to run
