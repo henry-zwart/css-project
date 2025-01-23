@@ -22,6 +22,8 @@ class Vegetation:
         self.large_radius = large_radius
         self.positive_factor = positive_factor
         self.negative_factor = negative_factor
+        self.area = width * width
+        self.proportion_alive_list = []
 
     def initial_grid(self, p):
         random_matrix = np.random.random(self.grid.shape)
@@ -67,6 +69,39 @@ class Vegetation:
 
         return alive
 
+    def total_alive(self):
+        """Counts total number of alive cells in the grid."""
+
+        alive = self.grid.sum()
+
+        return alive
+
+    def is_steady_state(self):
+        """Checks whether a steady state is reached using first order and second
+        order difference"""
+
+        # Selects 21 last iterations to look at a trend instead of local fluctuation
+        # and the index of the middle term of second difference was
+        # a whole integer
+        if (len(self.proportion_alive_list)) > 21:
+            der = self.proportion_alive_list[-21] - self.proportion_alive_list[-1]
+            der_2 = (
+                self.proportion_alive_list[-21]
+                + self.proportion_alive_list[-1]
+                - 2 * self.proportion_alive_list[-11]
+            )
+            if abs(der) < 0.001 and abs(der_2) < 0.001:
+                print(f"difference: {der}, second order difference: {der}")
+                return True
+        return False
+
+    def find_steady_state(self, iterations):
+        for iter in range(iterations):
+            if self.is_steady_state():
+                print(f"Iteration: {iter}")
+                break
+            self.update()
+
     def update(self):
         temp_grid = np.empty_like(self.grid)
 
@@ -95,14 +130,4 @@ class Vegetation:
                     temp_grid[y, x] = 1
 
         self.grid = temp_grid
-
-    def total_alive(self):
-        """Counts total number of alive cells in the grid."""
-        alive = 0
-
-        for y in range(self.width):
-            for x in range(self.width):
-                if self.grid[y, x] == 1:
-                    alive += 1
-
-        return alive
+        self.proportion_alive_list.append(self.total_alive() / self.area)
