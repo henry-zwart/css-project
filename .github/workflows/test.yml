@@ -1,4 +1,4 @@
-name: Run tests and update docs
+name: Tests
 
 on:
   push:
