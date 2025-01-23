@@ -29,25 +29,14 @@ class Vegetation:
         random_matrix = np.random.random(self.grid.shape)
         self.grid = np.where(random_matrix < p, 1, 0)
 
-    def find_close_neighbors(self, x, y):
+    def find_neighbors(self, x, y, radius):
+        """Positive = close
+        Negative = far"""
         indexes = []
-        left = -1 * self.small_radius
-        right = self.small_radius + 1
-        for delta_y in range(left, right):
-            if y + delta_y < 0 or y + delta_y > self.width - 1:
-                continue
-            for delta_x in range(left, right):
-                if x + delta_x < 0 or x + delta_x > self.width - 1:
-                    continue
-                if delta_x == 0 and delta_y == 0:
-                    continue
-                indexes.append([x + delta_x, y + delta_y])
-        return indexes
 
-    def find_far_neighbors(self, x, y):
-        indexes = []
-        left = -1 * self.large_radius
-        right = self.large_radius + 1
+        left = -1 * radius
+        right = radius + 1
+
         for delta_y in range(left, right):
             if y + delta_y < 0 or y + delta_y > self.width - 1:
                 continue
@@ -57,6 +46,7 @@ class Vegetation:
                 if delta_x == 0 and delta_y == 0:
                     continue
                 indexes.append([x + delta_x, y + delta_y])
+
         return indexes
 
     def find_states(self, neighbors):
@@ -64,7 +54,6 @@ class Vegetation:
 
         # Sums up all 'alive' neighbors
         for row, column in neighbors:
-            # print(self.grid[x, y])
             alive += self.grid[row, column]
 
         return alive
@@ -108,11 +97,11 @@ class Vegetation:
         for y in range(self.width):
             for x in range(self.width):
                 # Find local neighbors and calculate sum
-                close = self.find_close_neighbors(y, x)
+                close = self.find_neighbors(y, x, self.small_radius)
                 close_sum = self.find_states(close)
 
                 # Find non-local neighbors and calculate sum
-                far = self.find_far_neighbors(y, x)
+                far = self.find_neighbors(y, x, self.large_radius)
                 far_sum = self.find_states(far)
 
                 # Calculate positive and negative feedback
@@ -168,44 +157,31 @@ class InvasiveVegetation:
         self.pos_factor_inv = pos_factor_inv
         self.neg_factor_inv = neg_factor_inv
 
-    def initial_grid(self, p_nat=0.5, p_inv=0.75):
-        """p_nat and p_inv should be percentile regions for
+    def initial_grid(self, p_nat=0.25, p_inv=0.25):
+        """p_nat and p_inv should be percentages for
         which something occurs. Example:
-        0.0 - 0.5: 0
-        0.5 - 0.75: 1 (native)
-        0.75 - 1.0: 2 (invasive)
+        p_nat = 0.3 so 30% of the initial grid is native.
+        The total of p_nat and p_inv cannot larger than 1 (100%).
         """
+        if (p_nat + p_inv) > 1:
+            raise ValueError("Total of p_nat and p_inv cannot be larger than 1")
+
+        # Set the percentile region for p_inv
+        p_inv += p_nat
 
         # Assume p_nat is the lowest
         random_matrix = np.random.random(self.grid.shape)
-        self.grid[np.where(random_matrix < p_nat)] = 0
-        self.grid[np.where((random_matrix >= p_nat) & (random_matrix < p_inv))] = 1
-        self.grid[np.where(random_matrix >= p_inv)] = 2
+        self.grid[np.where(random_matrix <= p_nat)] = 1
+        self.grid[np.where((random_matrix > p_nat) & (random_matrix <= p_inv))] = 2
+        self.grid[np.where(random_matrix > p_inv)] = 0
 
-    def find_close_neighbors(self, x, y):
-        """Positive = close"""
+    def find_neighbors(self, x, y, radius):
+        """Positive = close
+        Negative = far"""
         indexes = []
 
-        left = -1 * self.small_radius
-        right = self.small_radius + 1
-
-        for delta_y in range(left, right):
-            if y + delta_y < 0 or y + delta_y > self.width - 1:
-                continue
-            for delta_x in range(left, right):
-                if x + delta_x < 0 or x + delta_x > self.width - 1:
-                    continue
-                if delta_x == 0 and delta_y == 0:
-                    continue
-                indexes.append([x + delta_x, y + delta_y])
-
-        return indexes
-
-    def find_far_neighbors(self, x, y):
-        """far = negative"""
-        indexes = []
-        left = -1 * self.large_radius
-        right = self.large_radius + 1
+        left = -1 * radius
+        right = radius + 1
 
         for delta_y in range(left, right):
             if y + delta_y < 0 or y + delta_y > self.width - 1:
@@ -227,9 +203,9 @@ class InvasiveVegetation:
         # Sums up all 'alive' neighbors
         for row, column in neighbors:
             if self.grid[row, column] == 1:
-                native += self.grid[row, column]
+                native += 1
             elif self.grid[row, column] == 2:
-                invasive += min(self.grid[row, column], 1)
+                invasive += 1
 
         return native, invasive
 
@@ -239,21 +215,24 @@ class InvasiveVegetation:
         for y in range(self.width):
             for x in range(self.width):
                 # Find local neighbors and calculate sum
-                close = self.find_close_neighbors(y, x)
+                close = self.find_neighbors(y, x, self.small_radius)
                 close_nat, close_inv = self.find_states(close)
                 # close_sum = self.find_states(close)
 
                 # Find non-local neighbors and calculate sum
-                far = self.find_far_neighbors(y, x)
+                far = self.find_neighbors(y, x, self.large_radius)
                 far_nat, far_inv = self.find_states(far)
+
+                # Calculate negative feedback
+                neg_feedback = self.neg_factor_nat * far_nat
 
                 # Calculate positive and negative feedback
                 feedback_nat = self.pos_factor_nat * close_nat - (
-                    (self.neg_factor_nat * far_nat) + (self.neg_factor_inv * far_inv)
+                    neg_feedback + (self.neg_factor_inv * far_inv)
                 )
 
                 feedback_inv = self.pos_factor_inv * close_inv - (
-                    (self.neg_factor_nat * far_nat) + (self.neg_factor_inv * far_inv)
+                    neg_feedback + (self.neg_factor_inv * far_inv)
                 )
 
                 # Empty cell
@@ -290,11 +269,7 @@ class InvasiveVegetation:
         alive_nat = 0
         alive_inv = 0
 
-        for y in range(self.width):
-            for x in range(self.width):
-                if self.grid[y, x] == 1:
-                    alive_nat += 1
-                elif self.grid[y, x] == 2:
-                    alive_inv += 1
+        alive_nat += (self.grid == 1).sum().item()
+        alive_inv += (self.grid == 2).sum().item()
 
         return alive_nat, alive_inv

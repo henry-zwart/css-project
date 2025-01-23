@@ -5,6 +5,7 @@ from css_project.visualisation import animate_ca, plot_grid
 
 if __name__ == "__main__":
     width = 128
+    timespan = 40
 
     # This code runs without invasive species
     """vegetation = Vegetation(width)
@@ -53,13 +54,18 @@ if __name__ == "__main__":
 
     t = 0
     total_cells = width * width
-    # alive_nat, alive_inv = [vegetation.total_alive()]
 
-    while t < 40:
+    alive_nat = []
+    alive_inv = []
+    alive_n, alive_i = vegetation.total_alive()
+    alive_nat.append(alive_n)
+    alive_inv.append(alive_i)
+
+    while t < timespan:
         vegetation.update()
-        # alive_n, alive_i = [vegetation.total_alive()]
-        # alive_nat.append(alive_n)
-        # alive_inv.append(alive_i)
+        alive_n, alive_i = vegetation.total_alive()
+        alive_nat.append(alive_n)
+        alive_inv.append(alive_i)
         t += 1
 
     fig, ax = plot_grid(vegetation)
@@ -67,6 +73,16 @@ if __name__ == "__main__":
 
     # Reset grid to initial state
     vegetation.grid = initial_grid.copy()
-
-    ani = animate_ca(vegetation, 100)
+    ani = animate_ca(vegetation, timespan)
     ani.save("vegetation.gif")
+
+    iterations = list(range(len(alive_nat)))
+
+    # Plot ratio of dead, native, and invasive cells
+    plt.figure(figsize=(8, 6))
+    plt.plot(iterations, alive_nat, linestyle="-", label="Native Species")
+    plt.plot(iterations, alive_inv, linestyle="-", label="Invasive Species")
+    plt.title("Proportion of Native and Invasive species vs Iterations")
+    plt.xlabel("Time Step")
+    plt.ylabel("Proportion Cells")
+    plt.savefig("proportion_nat_inv.png", dpi=300)
