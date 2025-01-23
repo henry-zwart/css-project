@@ -1,6 +1,6 @@
 # Group project for Complex System Simulation
 
-[![Tests](https://github.com/henry-zwart/css-project/actions/workflows/release.yml/badge.svg)](https://github.com/henry-zwart/css-project/actions/workflows/release.yml)
+[![Tests](https://github.com/henry-zwart/css-project/actions/workflows/test.yml/badge.svg)](https://github.com/henry-zwart/css-project/actions/workflows/test.yml)
 
 ## Development - Getting started
 
