@@ -235,6 +235,59 @@ def run_model_multiple(
     return
 
 
+def heatmap_final_proportions(runs, width):
+    # invase vs native on x and y
+    # final proportion of native (normalized), 0 is green
+    # green what it was at equilibrium
+
+    # divide values by initial proportion
+
+    t_eq = 20  # Change with steady state implementation
+    p_values = np.linspace(0, 1, runs)
+
+    for n_value in p_values:
+        vegetation = InvasiveVegetation(width)
+
+        vegetation.initial_grid(p_nat=n_value, type="equilibrium")
+
+        total_cells = vegetation.width * vegetation.width
+        alive_nat = []
+        alive_inv = []
+        alive_nat, alive_inv = count_states(
+            alive_nat, alive_inv, vegetation, total_cells
+        )
+
+        t = 0
+        while t < t_eq:
+            vegetation.update()
+            t += 1
+        alive_nat, alive_inv = count_states(
+            alive_nat, alive_inv, vegetation, total_cells
+        )
+
+        initial_grid = vegetation.grid.copy()
+
+        for i_value in p_values:
+            # p_nat = n_value
+            # p_inv = i_value
+
+            # Copy grid to use for different invasive concentrations
+
+            # Introduce invasive species
+            vegetation.introduce_invasive(i_value, inv_type="random")
+
+            t = 0
+            while t < timespan:
+                vegetation.update()
+                t += 1
+            alive_nat, alive_inv = count_states(
+                alive_nat, alive_inv, vegetation, total_cells
+            )
+
+            # Reset grid to initial state
+            vegetation.grid = initial_grid.copy()
+
+
 if __name__ == "__main__":
     timespan = 10
     width = 64
