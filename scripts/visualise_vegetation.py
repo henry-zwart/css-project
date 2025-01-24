@@ -1,14 +1,16 @@
 import matplotlib.pyplot as plt
+import numpy as np
+from scipy.ndimage import label, sum
 
-from css_project.vegetation import InvasiveVegetation
-from css_project.visualisation import plot_grid
+from css_project.vegetation import InvasiveVegetation, Vegetation
+from css_project.visualisation import animate_ca, plot_grid
 
 if __name__ == "__main__":
     timespan = 40
     width = 64
 
     # This code runs without invasive species
-    """vegetation = Vegetation(width)
+    vegetation = Vegetation(width)
     vegetation.initial_grid(p=0.5)
 
     initial_grid = vegetation.grid.copy()
@@ -32,16 +34,14 @@ if __name__ == "__main__":
 
     fig, ax = plot_grid(vegetation)
     fig.savefig("veg_grid_after.png", dpi=300)
-    
+
     # Plot ratio of alive vs dead cells
     # vegetation = Vegetation(128)
     # vegetation.initial_grid(p=0.5)
     # ani = animate_ca(vegetation, 1)
     # plt.show()
     # ani.save("vegetation.mp4")
-    # """
 
-    """
     # This code runs with invasive species
     vegetation = InvasiveVegetation(width)
     vegetation.initial_grid()
@@ -116,7 +116,7 @@ if __name__ == "__main__":
     plt.xlabel("Cluster size")
     plt.ylabel("Number of patches")
     plt.savefig("cluster_size_distribution.png", dpi=300)
-    plt.show()"""
+    plt.show()
 
     # This code introduces invasive species (randomly) after establishing
     # native population
