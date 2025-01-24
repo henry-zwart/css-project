@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import powerlaw
 from scipy.ndimage import label, sum
 
 from css_project.vegetation import InvasiveVegetation, Vegetation
@@ -27,7 +28,7 @@ if __name__ == "__main__":
     total_cells = width * width
     alive = [vegetation.total_alive() / total_cells]
 
-    while t < 20:
+    while t < 50:
         vegetation.update()
         alive.append(vegetation.total_alive() / total_cells)
         t += 1
@@ -106,7 +107,7 @@ if __name__ == "__main__":
     # Find frequencies of the found cluster sizes
     clusters_freq = np.unique(clusters, return_counts=True)
 
-    # Plot
+    # Plot of cluster size distribution
     plt.figure(figsize=(8, 6))
     plt.plot(clusters_freq[0], clusters_freq[1], "o")
     plt.xlim([6, 1000])
