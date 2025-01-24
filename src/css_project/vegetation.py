@@ -146,7 +146,7 @@ class InvasiveVegetation:
         self.pos_factor_inv = pos_factor_inv
         self.neg_factor_inv = neg_factor_inv
 
-    def initial_grid(self, p_nat=0.25, p_inv=0.25):
+    def initial_grid(self, p_nat=0.25, p_inv=0.25, type="random"):
         """p_nat and p_inv should be percentages for
         which something occurs. Example:
         p_nat = 0.3 so 30% of the initial grid is native.
@@ -158,11 +158,21 @@ class InvasiveVegetation:
         # Set the percentile region for p_inv
         p_inv += p_nat
 
-        # Assume p_nat is the lowest
-        random_matrix = np.random.random(self.grid.shape)
-        self.grid[np.where(random_matrix <= p_nat)] = 1
-        self.grid[np.where((random_matrix > p_nat) & (random_matrix <= p_inv))] = 2
-        self.grid[np.where(random_matrix > p_inv)] = 0
+        if type == "random":
+            random_matrix = np.random.random(self.grid.shape)
+            self.grid[np.where(random_matrix <= p_nat)] = 1
+            self.grid[np.where((random_matrix > p_nat) & (random_matrix <= p_inv))] = 2
+            self.grid[np.where(random_matrix > p_inv)] = 0
+
+        elif type == "equilibrium":
+            random_matrix = np.random.random(self.grid.shape)
+            self.grid[np.where(random_matrix <= p_nat)] = 1
+            self.grid[np.where(random_matrix > p_nat)] = 0
+
+    def introduce_invasive(self, p_inv=0.1, type="random"):
+        if type == "random":
+            random_matrix = np.random.random(self.grid.shape)
+            self.grid[np.where(random_matrix <= p_inv)] = 2
 
     def find_neighbors(self, x, y, radius):
         """Positive = close
