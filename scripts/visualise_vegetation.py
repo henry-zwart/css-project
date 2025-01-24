@@ -3,7 +3,7 @@ import numpy as np
 import powerlaw
 from scipy.ndimage import label, sum
 
-from css_project.vegetation import InvasiveVegetation, Vegetation
+from css_project.vegetation import Vegetation
 from css_project.visualisation import animate_ca, plot_grid
 
 if __name__ == "__main__":
