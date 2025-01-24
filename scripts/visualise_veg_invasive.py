@@ -260,7 +260,7 @@ def heatmap_final_proportions(runs, width, timespan):
         for _ in range(t_eq):
             vegetation.update()
 
-        alive_nat_eq, _ = vegetation.total_alive()
+        # alive_nat_eq, _ = vegetation.total_alive()
 
         initial_grid = vegetation.grid.copy()
 
@@ -274,11 +274,14 @@ def heatmap_final_proportions(runs, width, timespan):
             alive_nat, _ = vegetation.total_alive()
 
             # Add values to heatmap
-            # Change function
-            if alive_nat_eq == 0 or alive_nat == 0:
-                heatmap[n_idx, i_idx] = 0
-            else:
-                heatmap[n_idx, i_idx] = alive_nat / alive_nat_eq
+            # Choose this for normalized
+            # if alive_nat_eq == 0 or alive_nat == 0:
+            #     heatmap[n_idx, i_idx] = 0
+            # else:
+            #     heatmap[n_idx, i_idx] = alive_nat / alive_nat_eq
+
+            # Choose this for total amount
+            heatmap[n_idx, i_idx] = alive_nat
 
             # Reset grid to initial state
             vegetation.grid = initial_grid.copy()
