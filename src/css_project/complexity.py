@@ -26,12 +26,15 @@ class Compression(StrEnum):
                 return lzma.compress(string)
 
 
-def compressed_size(arr: np.ndarray, compression: Compression) -> int:
-    """Compress a numpy array, and return the compressed size.
+def compressed_size(arr: np.ndarray, compression: Compression) -> float:
+    """Compress a numpy array, and return the compression factor.
 
     This gives an estimate of the Kolmogorov complexity of the array.
     Supported compression methods:
         - zlib
+        - gzip
+        - bz2
+        - lzma
     """
     serialised_arr = pickle.dumps(arr)
-    return len(compression.compress(serialised_arr))
+    return len(compression.compress(serialised_arr)) / len(serialised_arr)
