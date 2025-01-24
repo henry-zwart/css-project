@@ -235,7 +235,7 @@ def run_model_multiple(
     return
 
 
-def heatmap_final_proportions(runs, width):
+def heatmap_final_proportions(runs, width, timespan):
     # invase vs native on x and y
     # final proportion of native (normalized), 0 is green
     # green what it was at equilibrium
