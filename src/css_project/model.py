@@ -1,10 +1,23 @@
+"""Base class for vegetation cellular automata models."""
+
 from abc import ABC, abstractmethod
 
 import numpy as np
 
 
 class VegetationModel(ABC):
+    """2D vegetation cellular automata abstract base class.
+
+    Attributes:
+        width: The number of cells in one side of the cellular automata grid.
+        area: The total number of cells in the cellular automata grid.
+        proportion_alive_list: A sequence of floats describing the proportion of
+            living cells at each step in the cellular automata's history.
+    """
+
     grid: np.ndarray
+    width: int
+    area: int
     proportion_alive_list: list[float]
 
     def __init__(
@@ -13,6 +26,16 @@ class VegetationModel(ABC):
         species_prop: float | np.ndarray | list[float],
         init_method: str,
     ):
+        """Initialises the cellular automata.
+
+        Args:
+            width: The number of cells in one side of the cellular automata grid.
+            species_prop: A float, or sequence of floats, describing the initial
+                occurrence probability of each species. The probability of 'dead
+                cells' is omitted. The order reflects the order of the integers
+                representing the species'.
+            init_method: The method used to initialise the grid with species.
+        """
         self.width = width
         self.area = width * width
         self.proportion_alive_list = []
@@ -20,12 +43,37 @@ class VegetationModel(ABC):
 
     @property
     @abstractmethod
-    def n_states(self) -> int: ...
+    def n_states(self) -> int:
+        """The number of represented states, equal to 1 + the number of species'."""
+        ...
 
     @abstractmethod
-    def update(self): ...
+    def update(self):
+        """Transition one timestep on the cellular automata grid.
+
+        Update the cells via the specified transition rules, as well as any
+        environmental features.
+        """
+        ...
 
     def initial_grid(self, p: float | np.ndarray | list[float], type="random"):
+        """Initialise species' populations in the grid.
+
+        After sampling from U(0,1) for each cell in the grid, the inverse-transform
+        method is used to assign cells to the model's species' (including dead cells)
+        in their specified proportions.
+
+        Args:
+            p: A float, or sequence of floats, describing the initial
+                occurrence probability of each species. The probability of 'dead
+                cells' is omitted. The order reflects the order of the integers
+                representing the species'.
+            type: The method used to initialise the grid (**currently unused**).
+
+        Raises:
+            ValueError: Supplied species probabilities don't permit a valid probability
+            distribution (i.e., their sum exceeds 1.0).
+        """
         match p:
             case float(prob):
                 probs = np.array([prob])
@@ -37,7 +85,6 @@ class VegetationModel(ABC):
             raise ValueError("Species proportions sum must not exceed 1.0.")
 
         probs = np.concat(([0, zero_prob], probs))
-        print(probs)
         prob_ranges = np.cumsum(probs)
 
         grid = np.zeros((self.width, self.width), dtype=np.int64)
@@ -49,7 +96,14 @@ class VegetationModel(ABC):
         self.grid = grid
 
     def find_states(self, neighbors) -> list[int]:
-        """Count neighbours of each species."""
+        """Count the occurrences of the model species' in a set of grid indexes.
+
+        Args:
+            neighbors: A list of indexes in the grid.
+
+        Returns:
+            A list of occurrences, ordered by species identifier.
+        """
         counts = [0 for _ in range(self.n_states)]
         for row, column in neighbors:
             for s in range(1, self.n_states):
@@ -57,9 +111,18 @@ class VegetationModel(ABC):
 
         return counts[1:]
 
-    def find_neighbors(self, x, y, radius):
-        """Positive = close
-        Negative = far"""
+    def find_neighbors(self, x: int, y: int, radius: int) -> list[list[int]]:
+        """Determine the indexes within a given radius of a grid cell.
+
+        Args:
+            x: Grid cell row.
+            y: Grid cell column.
+            radius: Radius within which to identify neighbors.
+
+        Returns:
+            A list of (row, column) tuples describing the grid locations of
+            the given cell's neighbors.
+        """
         indexes = []
 
         left = -1 * radius
@@ -78,18 +141,37 @@ class VegetationModel(ABC):
         return indexes
 
     def total_alive(self) -> int:
-        """Counts total number of alive cells in the grid."""
+        """Count the total number of living cells in the grid.
+
+        Returns:
+            The number of cells with non-zero state.
+        """
         alive = (self.grid > 0).sum()
         return alive
 
     def species_alive(self) -> list[int]:
+        """Calculate the frequency of each species in the grid.
+
+        Returns:
+            For each species, the number of cells with that state. Ordered by
+            species identifier.
+        """
         x = [(self.grid == i).sum() for i in range(1, self.n_states)]
         return x
 
-    def is_steady_state(self):
-        """Checks whether a steady state is reached using first order and second
-        order difference"""
+    def is_steady_state(self, threshold: float = 0.001) -> bool:
+        """Determine whether the grid is in a steady state compared to its history.
 
+        Estimates the derivative of the proportion of living cells with respect
+        to the prior 21 updates.
+
+        Args:
+            threshold: Threshold under which the first derivative is considered stable.
+
+        Returns:
+            True if the current state is determined to be at equilibrium. Otherwise
+            False.
+        """
         # Selects 21 last iterations to look at a trend instead of local fluctuation
         # and the index of the middle term of second difference was
         # a whole integer
@@ -100,12 +182,17 @@ class VegetationModel(ABC):
                 + self.proportion_alive_list[-1]
                 - 2 * self.proportion_alive_list[-11]
             )
-            if abs(der) < 0.001 and abs(der_2) < 0.001:
+            if abs(der) < threshold and abs(der_2) < threshold:
                 print(f"difference: {der}, second order difference: {der}")
                 return True
         return False
 
     def find_steady_state(self, iterations: int):
+        """Run the cellular automata until a steady state is reached.
+
+        Args:
+            iterations: Maximum number of iterations before termination.
+        """
         for iter in range(iterations):
             if self.is_steady_state():
                 print(f"Iteration: {iter}")
