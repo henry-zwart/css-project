@@ -17,8 +17,8 @@ class FineGrained:
         width: int = 128,
         nutrient_level: float = 1.0,
         nutrient_consume_rate: float = 0.1,
-        nutrient_diffusion_rate: float = 0.1,
-        nutrient_regenerate_rate: float = 0.1,
+        nutrient_diffusion_rate: float = 0.21,
+        nutrient_regenerate_rate: float = 0.8,
         random_seed: int | None = 42,
     ):
         if any(
@@ -37,6 +37,7 @@ class FineGrained:
         self.rng = default_rng(random_seed)
         self.grid = np.zeros((width, width), dtype=np.int64)
         self.width = width
+        self.area = width * width
         self.nutrients = np.zeros_like(self.grid, dtype=np.float64) + nutrient_level
         self.plant_matter = np.zeros_like(self.nutrients)
         self.compost = np.zeros_like(self.nutrients)
@@ -46,6 +47,7 @@ class FineGrained:
         self.nutrient_diffusion_kernel = kernel.nutrient_diffusion_kernel(
             nutrient_diffusion_rate
         )
+        self.proportion_alive_list = []
 
     def initial_grid(self, p: float):
         """Randomly initialise grid with occupation probability p."""
@@ -60,6 +62,37 @@ class FineGrained:
         )
         self.plant_matter = np.zeros_like(self.nutrients)
         self.compost = np.zeros_like(self.nutrients)
+
+    def total_alive(self):
+        """Counts total number of alive cells in the grid."""
+
+        alive = self.grid.sum()
+
+        return alive
+
+    def is_steady_state(self):
+        """Checks whether a steady state is reached using first order and second
+        order difference"""
+
+        # Selects 21 last iterations to look at a trend instead of local fluctuation
+        # and the index of the middle term of second difference was
+        # a whole integer
+        if (len(self.proportion_alive_list)) > 21:
+            der = self.proportion_alive_list[-21] - self.proportion_alive_list[-1]
+            der_2 = (
+                self.proportion_alive_list[-21]
+                + self.proportion_alive_list[-1]
+                - 2 * self.proportion_alive_list[-11]
+            )
+            if abs(der) < 0.001 and abs(der_2) < 0.001:
+                return True
+        return False
+
+    def find_steady_state(self, iterations):
+        for _ in range(iterations):
+            if self.is_steady_state():
+                break
+            self.update()
 
     def update(self):
         """Update grid state according to transition rules.
@@ -98,6 +131,8 @@ class FineGrained:
 
         # Diffuse nutrients
         self.diffuse_nutrients()
+
+        self.proportion_alive_list.append(self.total_alive() / self.area)
 
     def diffuse_nutrients(self):
         total_nutrients_before = self.nutrients.sum()
