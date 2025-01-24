@@ -247,12 +247,13 @@ def heatmap_final_proportions(runs, width, timespan):
     """
 
     t_eq = 20  # Change with steady state implementation
-    p_values = np.linspace(0, 1, runs)
+    i_values = np.linspace(0, 1, runs)
+    n_values = np.linspace(0.001, 0.1, runs)
     heatmap = np.zeros((runs, runs))
     alive_nat = []
     # alive_inv = []
 
-    for n_idx, n_value in enumerate(p_values):
+    for n_idx, n_value in enumerate(n_values):
         vegetation = InvasiveVegetation(width)
         # total_cells = vegetation.width * vegetation.width
         vegetation.initial_grid(p_nat=n_value, p_inv=0, type="equilibrium")
@@ -264,7 +265,7 @@ def heatmap_final_proportions(runs, width, timespan):
 
         initial_grid = vegetation.grid.copy()
 
-        for i_idx, i_value in enumerate(p_values):
+        for i_idx, i_value in enumerate(i_values):
             # Introduce invasive species
             vegetation.introduce_invasive(i_value, type="random")
 
@@ -301,7 +302,7 @@ def heatmap_final_proportions(runs, width, timespan):
 if __name__ == "__main__":
     timespan = 10
     width = 64
-    runs = 10
+    runs = 5
 
     heatmap_final_proportions(runs, width, timespan)
 
