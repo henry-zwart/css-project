@@ -3,7 +3,7 @@ import numpy as np
 import powerlaw
 from scipy.ndimage import label, sum
 
-from css_project.vegetation import InvasiveVegetation, Vegetation
+from css_project.vegetation import Vegetation
 from css_project.visualisation import animate_ca, plot_grid
 
 if __name__ == "__main__":
@@ -77,7 +77,7 @@ if __name__ == "__main__":
     plt.ylabel("Probability Density")
     plt.title("Cluster Size Power Law")
     plt.savefig("cluster_size_power_law.png", dpi=300)
-    
+
     # Plot ratio of alive vs dead cells
     # vegetation = Vegetation(128)
     # vegetation.initial_grid(p=0.5)
