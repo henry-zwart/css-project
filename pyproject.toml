@@ -36,6 +36,8 @@ testpaths = ["tests"]
 
 [tool.ruff.lint]
 select = [
+    # pydocstyle
+    #"D",
     # pycodestyle
     "E",
     # Pyflakes
@@ -52,4 +54,6 @@ select = [
 #ignore = [
 #    # removes unused imports
 #    "F401"
-#]
+
+#[tool.ruff.lint.pydocstyle]
+#convention = "google"
