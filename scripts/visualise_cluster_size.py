@@ -4,7 +4,6 @@ import powerlaw
 from scipy.ndimage import label, sum
 
 from css_project.vegetation import Vegetation
-from css_project.visualisation import animate_ca, plot_grid
 
 if __name__ == "__main__":
     timespan = 100
@@ -17,11 +16,10 @@ if __name__ == "__main__":
 
     initial_grid = vegetation.grid.copy()
 
-    #ani = animate_ca(vegetation, 20)
-    #ani.save("vegetation.gif")
+    # ani = animate_ca(vegetation, 20)
+    # ani.save("vegetation.gif")
 
     vegetation.grid = initial_grid.copy()
-
 
     t = 0
     total_cells = width * width
