@@ -242,61 +242,67 @@ def heatmap_final_proportions(runs, width, timespan):
 
     # divide values by initial proportion
 
+    """
+    To plot: different i for same n so have a
+    """
+
     t_eq = 20  # Change with steady state implementation
     p_values = np.linspace(0, 1, runs)
+    heatmap = np.zeros((runs, runs))
+    alive_nat = []
+    # alive_inv = []
 
-    for n_value in p_values:
+    for n_idx, n_value in enumerate(p_values):
         vegetation = InvasiveVegetation(width)
+        # total_cells = vegetation.width * vegetation.width
+        vegetation.initial_grid(p_nat=n_value, p_inv=0, type="equilibrium")
 
-        vegetation.initial_grid(p_nat=n_value, type="equilibrium")
-
-        total_cells = vegetation.width * vegetation.width
-        alive_nat = []
-        alive_inv = []
-        alive_nat, alive_inv = count_states(
-            alive_nat, alive_inv, vegetation, total_cells
-        )
-
-        t = 0
-        while t < t_eq:
+        for _ in range(t_eq):
             vegetation.update()
-            t += 1
-        alive_nat, alive_inv = count_states(
-            alive_nat, alive_inv, vegetation, total_cells
-        )
+
+        alive_nat_eq, _ = vegetation.total_alive()
 
         initial_grid = vegetation.grid.copy()
 
-        for i_value in p_values:
-            # p_nat = n_value
-            # p_inv = i_value
-
-            # Copy grid to use for different invasive concentrations
-
+        for i_idx, i_value in enumerate(p_values):
             # Introduce invasive species
-            vegetation.introduce_invasive(i_value, inv_type="random")
+            vegetation.introduce_invasive(i_value, type="random")
 
-            t = 0
-            while t < timespan:
+            for _ in range(timespan):
                 vegetation.update()
-                t += 1
-            alive_nat, alive_inv = count_states(
-                alive_nat, alive_inv, vegetation, total_cells
-            )
+
+            alive_nat, _ = vegetation.total_alive()
+
+            # Add values to heatmap
+            # Change function
+            heatmap[n_idx, i_idx] = alive_nat / alive_nat_eq
 
             # Reset grid to initial state
             vegetation.grid = initial_grid.copy()
+
+    # Plot the heatmap
+    plt.figure(figsize=(8, 6))
+    plt.imshow(
+        heatmap, origin="lower", extent=[0, 1, 0, 1], aspect="auto", cmap="viridis"
+    )
+    plt.colorbar(label="Normalized Final Concentration of Native Species")
+    plt.xlabel("Invasive Species Initial Concentration Probability")
+    plt.ylabel("Native Species Initial Concentration Probability")
+    plt.title("Impact of Invasive Species on Native Species (Heatmap)")
+    plt.show()
 
 
 if __name__ == "__main__":
     timespan = 10
     width = 64
-    runs = 5
+    runs = 10
 
-    vegetation = InvasiveVegetation(width)
+    heatmap_final_proportions(runs, width, timespan)
+
+    # vegetation = InvasiveVegetation(width)
     # run_model(vegetation, initial_state='equilibrium')
 
-    pp_inv = np.linspace(0, 1, runs, endpoint=False)
-    run_model_multiple(
-        vegetation, 0.25, pp_inv, timespan=timespan, initial_state="equilibrium"
-    )
+    # pp_inv = np.linspace(0, 1, runs, endpoint=False)
+    # run_model_multiple(
+    #    vegetation, 0.25, pp_inv, timespan=timespan, initial_state="equilibrium"
+    # )
