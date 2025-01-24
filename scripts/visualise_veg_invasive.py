@@ -148,9 +148,8 @@ def run_model_multiple(
             alive_inv = []
 
         # Plotting
-        print("alive nat tot: ", alive_nat_tot)
         plt.figure(figsize=(10, 8))
-        colors = cm.viridis(np.linspace(0, 1, len(pp_inv)))  # Create gradient colors
+        colors = cm.viridis(np.linspace(0, 1, len(pp_inv)))
 
         for i, (p_inv, color) in enumerate(zip(pp_inv, colors, strict=False)):
             iterations = list(range(len(alive_nat_tot[i])))
@@ -162,11 +161,11 @@ def run_model_multiple(
                 linestyle="-",
             )
 
-        plt.title("Proportion of Native Species vs Iterations")
+        plt.title("Proportion of Native Species for different p_inv")
         plt.xlabel("Time Step")
         plt.ylabel("Proportion of Cells")
         plt.legend(loc="upper right", fontsize="small")
-        plt.savefig("proportion_nat_inv_comparison_gradient.png", dpi=300)
+        plt.savefig("proportion_nat_gradient_eq.png", dpi=300)
         plt.show()
 
     if initial_state == "random":
@@ -210,7 +209,6 @@ def run_model_multiple(
             alive_inv = []
 
         # Plotting
-        print("alive nat tot: ", alive_nat_tot)
         plt.figure(figsize=(10, 8))
         colors = cm.viridis(np.linspace(0, 1, len(pp_inv)))
 
@@ -224,11 +222,11 @@ def run_model_multiple(
                 linestyle="-",
             )
 
-        plt.title("Proportion of Native Species vs Iterations")
+        plt.title("Proportion of Native Species for different p_inv")
         plt.xlabel("Time Step")
         plt.ylabel("Proportion of Cells")
         plt.legend(loc="upper right", fontsize="small")
-        plt.savefig("proportion_nat_inv_comparison_gradient.png", dpi=300)
+        plt.savefig("proportion_nat_gradient_random.png", dpi=300)
         plt.show()
 
     return
