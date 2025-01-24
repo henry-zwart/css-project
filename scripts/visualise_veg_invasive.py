@@ -298,6 +298,9 @@ def heatmap_final_proportions(runs, width, timespan):
     plt.title("Impact of Invasive Species on Native Species (Heatmap)")
     plt.show()
 
+    # Scatter c parameter, with native at eq on y-axis
+    # eq - final
+
 
 if __name__ == "__main__":
     timespan = 10
