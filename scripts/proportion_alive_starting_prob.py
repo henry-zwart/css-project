@@ -23,16 +23,14 @@ p_list = [
 ]
 
 p_list = np.logspace(start=-4, stop=0, num=100, base=10)
-print(p_list)
 width = 64
 
 iterations_list = []
 alive_list = []
 
 for p in tqdm(p_list):
-    vegetation = Vegetation(width)
-    vegetation.initial_grid(p)
-    Vegetation.find_steady_state(vegetation, 1000)
+    vegetation = Vegetation(width, alive_prop=p)
+    vegetation.find_steady_state(1000)
     iterations = list(range(len(vegetation.proportion_alive_list)))
     alive_list.append(vegetation.proportion_alive_list)
     iterations_list.append(iterations)
