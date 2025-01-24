@@ -101,9 +101,8 @@ def run_model_multiple(
     t_eq=30,
     inv_type="random",
 ):
-    vegetation.initial_grid(type=initial_state)
-
     if initial_state == "equilibrium":
+        vegetation.initial_grid(type=initial_state)
         t = 0
         total_cells = vegetation.width * vegetation.width
 
@@ -168,7 +167,8 @@ def run_model_multiple(
         plt.savefig("proportion_nat_gradient_eq.png", dpi=300)
         plt.show()
 
-    if initial_state == "random":
+    elif initial_state == "random":
+        vegetation.initial_grid(type=initial_state)
         t = 0
         total_cells = vegetation.width * vegetation.width
 
@@ -229,6 +229,9 @@ def run_model_multiple(
         plt.savefig("proportion_nat_gradient_random.png", dpi=300)
         plt.show()
 
+    else:
+        raise ValueError("Inapropriate initial state type passed.")
+
     return
 
 
@@ -242,5 +245,5 @@ if __name__ == "__main__":
 
     pp_inv = np.linspace(0, 1, runs, endpoint=False)
     run_model_multiple(
-        vegetation, 0.25, pp_inv, timespan=timespan, initial_state="random"
+        vegetation, 0.25, pp_inv, timespan=timespan, initial_state="equilibrium"
     )
