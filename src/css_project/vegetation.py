@@ -1,4 +1,7 @@
 import numpy as np
+from scipy import signal
+
+from css_project.kernel import neighbour_count_kernel
 
 from .model import VegetationModel
 
@@ -21,39 +24,23 @@ class Vegetation(VegetationModel):
         self.large_radius = large_radius
         self.positive_factor = positive_factor
         self.negative_factor = negative_factor
+        self.close_kernel = neighbour_count_kernel(self.small_radius)
+        self.far_kernel = neighbour_count_kernel(self.large_radius)
 
     @property
     def n_states(self) -> int:
         return 2
 
+    def compute_feedback(self, n_close: np.ndarray, n_far: np.ndarray) -> np.ndarray:
+        raw_feedback = self.positive_factor * n_close - self.negative_factor * n_far
+        return np.clip(np.fix(raw_feedback), -1, 1).astype(int)
+
     def update(self):
-        temp_grid = np.empty_like(self.grid)
-
-        for y in range(self.width):
-            for x in range(self.width):
-                # Find local neighbors and calculate sum
-                close = self.find_neighbors(y, x, self.small_radius)
-                close_sum = self.find_states(close)[0]
-
-                # Find non-local neighbors and calculate sum
-                far = self.find_neighbors(y, x, self.large_radius)
-                far_sum = self.find_states(far)[0]
-
-                # Calculate positive and negative feedback
-                feedback = (
-                    self.positive_factor * close_sum - self.negative_factor * far_sum
-                )
-
-                # Add either -1, 0 or 1 to current state
-                temp_grid[y, x] = self.grid[y, x] + max(-1, min(1, int(feedback)))
-
-                # Ensure minimum/maximum possible values
-                if temp_grid[y, x] < 0:
-                    temp_grid[y, x] = 0
-                if temp_grid[y, x] > 1:
-                    temp_grid[y, x] = 1
-
-        self.grid = temp_grid
+        close_neighbours = count_neighbours(self.grid, self.close_kernel)
+        far_neighbours = count_neighbours(self.grid, self.far_kernel)
+        feedback = self.compute_feedback(close_neighbours, far_neighbours)
+        self.grid[feedback < 0] = 0
+        self.grid[feedback > 0] = 1
         self.proportion_alive_list.append(self.total_alive() / self.area)
 
 
@@ -141,12 +128,20 @@ class InvasiveVegetation(VegetationModel):
 
         self.grid = temp_grid
 
-    # def total_alive(self):
-    #    """Counts total number of alive cells in the grid."""
-    #    alive_nat = 0
-    #    alive_inv = 0
 
-    #    alive_nat += (self.grid == 1).sum().item()
-    #    alive_inv += (self.grid == 2).sum().item()
+def count_neighbours(states: np.ndarray, kern: np.ndarray) -> np.ndarray:
+    """Count the neighbours of each cell in a grid.
 
-    #    return alive_nat, alive_inv
+    If the input array is 2D, assumed to be the binary states
+    at each row, col.
+
+    If the input array is 3D, the first dimension is assumed
+    to be a 'species' dimension, with the full shape being
+    (species, row, column). Each layer is assumed to be
+    a 2D array as in the 2D case.
+
+    In the 2D case, returns the number of neighbours for each
+    cell. In the 3D case, separates these counts by species,
+    returning a matrix of the same shape as the input array.
+    """
+    return signal.convolve2d(states, kern, mode="same", boundary="fill")
