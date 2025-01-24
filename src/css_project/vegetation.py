@@ -1,6 +1,6 @@
 import numpy as np
 
-np.random.seed(1)
+np.random.seed(2)
 
 
 class Vegetation:
@@ -120,17 +120,6 @@ class Vegetation:
 
         self.grid = temp_grid
         self.proportion_alive_list.append(self.total_alive() / self.area)
-
-    def total_alive(self):
-        """Counts total number of alive cells in the grid."""
-        alive = 0
-
-        for y in range(self.width):
-            for x in range(self.width):
-                if self.grid[y, x] == 1:
-                    alive += 1
-
-        return alive
 
 
 class InvasiveVegetation:
