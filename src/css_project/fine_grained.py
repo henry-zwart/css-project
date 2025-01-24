@@ -17,7 +17,8 @@ class FineGrained:
         width: int = 128,
         nutrient_level: float = 1.0,
         nutrient_consume_rate: float = 0.1,
-        nutrient_diffusion_rate: float = 0.1,
+        nutrient_diffusion_rate: float = 0.21,
+        nutrient_regenerate_rate: float = 0.8,
         random_seed: int | None = 42,
     ):
         if any(
@@ -36,17 +37,62 @@ class FineGrained:
         self.rng = default_rng(random_seed)
         self.grid = np.zeros((width, width), dtype=np.int64)
         self.width = width
+        self.area = width * width
         self.nutrients = np.zeros_like(self.grid, dtype=np.float64) + nutrient_level
+        self.plant_matter = np.zeros_like(self.nutrients)
+        self.compost = np.zeros_like(self.nutrients)
         self.nutrient_level = nutrient_level
         self.nutrient_consume_rate = nutrient_consume_rate
+        self.nutrient_regenerate_rate = nutrient_regenerate_rate
         self.nutrient_diffusion_kernel = kernel.nutrient_diffusion_kernel(
             nutrient_diffusion_rate
         )
+        self.proportion_alive_list = []
 
     def initial_grid(self, p: float):
         """Randomly initialise grid with occupation probability p."""
         random_matrix = self.rng.random(self.grid.shape)
         self.grid = np.where(random_matrix < p, 1, 0)
+        self.original_grid = self.grid.copy()
+
+    def reset(self):
+        self.grid = self.original_grid.copy()
+        self.nutrients = (
+            np.zeros_like(self.grid, dtype=np.float64) + self.nutrient_level
+        )
+        self.plant_matter = np.zeros_like(self.nutrients)
+        self.compost = np.zeros_like(self.nutrients)
+
+    def total_alive(self):
+        """Counts total number of alive cells in the grid."""
+
+        alive = self.grid.sum()
+
+        return alive
+
+    def is_steady_state(self):
+        """Checks whether a steady state is reached using first order and second
+        order difference"""
+
+        # Selects 21 last iterations to look at a trend instead of local fluctuation
+        # and the index of the middle term of second difference was
+        # a whole integer
+        if (len(self.proportion_alive_list)) > 21:
+            der = self.proportion_alive_list[-21] - self.proportion_alive_list[-1]
+            der_2 = (
+                self.proportion_alive_list[-21]
+                + self.proportion_alive_list[-1]
+                - 2 * self.proportion_alive_list[-11]
+            )
+            if abs(der) < 0.001 and abs(der_2) < 0.001:
+                return True
+        return False
+
+    def find_steady_state(self, iterations):
+        for _ in range(iterations):
+            if self.is_steady_state():
+                break
+            self.update()
 
     def update(self):
         """Update grid state according to transition rules.
@@ -56,12 +102,28 @@ class FineGrained:
         2. Vegetation spreads to nearby cells.
         3. Diffuse nutrients.
         """
+        is_occupied = self.grid == 1
+        has_sufficient_nutrients = self.nutrients > self.nutrient_consume_rate
+        reduce_nutrients = is_occupied & has_sufficient_nutrients
+        exhaust_nutrients = is_occupied & ~has_sufficient_nutrients
 
-        # Consume nutrients. If nutrients become negative, plant dies.
-        self.nutrients[np.where(self.grid)] -= self.nutrient_consume_rate
-        insufficient_nutrients = self.nutrients < 0
-        self.nutrients[insufficient_nutrients] = 0
-        self.grid[insufficient_nutrients] = 0
+        # Regenerate nutrients in soil from dead plants
+        sufficient_compost = self.compost > self.nutrient_regenerate_rate
+        self.nutrients[sufficient_compost] += self.nutrient_regenerate_rate
+        self.compost[sufficient_compost] -= self.nutrient_regenerate_rate
+        self.nutrients[~sufficient_compost] += self.compost[~sufficient_compost]
+        self.compost[~sufficient_compost] = 0.0
+
+        # Plants consume nutrients
+        self.plant_matter[reduce_nutrients] += self.nutrient_consume_rate
+        self.nutrients[reduce_nutrients] -= self.nutrient_consume_rate
+
+        # If insufficient nutrients, exhaust supply and kill plant
+        self.plant_matter[exhaust_nutrients] += self.nutrients[exhaust_nutrients]
+        self.nutrients[exhaust_nutrients] = 0.0
+        self.grid[exhaust_nutrients] = 0
+        self.compost[exhaust_nutrients] += self.plant_matter[exhaust_nutrients]
+        self.plant_matter[exhaust_nutrients] = 0.0
 
         # Spread vegetation to nearby cells
         n_occupied = count_neighbours(self.grid)
@@ -69,6 +131,8 @@ class FineGrained:
 
         # Diffuse nutrients
         self.diffuse_nutrients()
+
+        self.proportion_alive_list.append(self.total_alive() / self.area)
 
     def diffuse_nutrients(self):
         total_nutrients_before = self.nutrients.sum()
@@ -78,6 +142,9 @@ class FineGrained:
         total_nutrients_after = self.nutrients.sum()
         nutrients_lost = total_nutrients_before - total_nutrients_after
         self.nutrients += nutrients_lost / self.width**2
+
+    def system_nutrients(self):
+        return self.nutrients.sum() + self.plant_matter.sum() + self.compost.sum()
 
 
 def count_neighbours(states: np.ndarray) -> np.ndarray:

@@ -49,3 +49,7 @@ select = [
     # isort
     "I",
 ]
+#ignore = [
+#    # removes unused imports
+#    "F401"
+#]
