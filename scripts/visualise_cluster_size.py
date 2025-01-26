@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import powerlaw
 from scipy.ndimage import label, sum
+from tqdm import trange
 
 from css_project.vegetation import Vegetation
 
@@ -20,15 +21,12 @@ if __name__ == "__main__":
     # ani.save("vegetation.gif")
 
     vegetation.grid = initial_grid.copy()
-
-    t = 0
+    n = 50
     total_cells = width * width
     alive = [vegetation.total_alive() / total_cells]
-
-    while t < 50:
+    for _ in trange(n):
         vegetation.update()
         alive.append(vegetation.total_alive() / total_cells)
-        t += 1
 
     # Cluster size distribution
 
