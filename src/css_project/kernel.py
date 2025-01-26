@@ -15,3 +15,13 @@ def nutrient_diffusion_kernel(rate: float):
     )
     kernel[1, 1] = 1 - rate
     return kernel
+
+
+def neighbour_count_kernel(radius: int = 1) -> np.ndarray:
+    if radius < 1:
+        raise ValueError(f"Radius must be at least 1, found: {radius}.")
+
+    side_length = 2 * radius + 1
+    kernel = np.ones((side_length, side_length), dtype=np.int64)
+    kernel[(side_length // 2), (side_length // 2)] = 0
+    return kernel

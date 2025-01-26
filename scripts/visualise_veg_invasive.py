@@ -7,7 +7,7 @@ from css_project.visualisation import animate_ca, plot_grid
 
 
 def count_states(alive_nat, alive_inv, vegetation, total_cells):
-    alive_n, alive_i = vegetation.total_alive()
+    alive_n, alive_i = vegetation.species_alive()
     alive_nat.append(alive_n / total_cells)
     alive_inv.append(alive_i / total_cells)
 
@@ -33,7 +33,7 @@ def run_animation(vegetation, timespan):
 
 
 def run_model(
-    vegetation,
+    width,
     p_nat=0.25,
     p_inv=0.25,
     timespan=40,
@@ -41,7 +41,7 @@ def run_model(
     t_eq=20,
     inv_type="random",
 ):
-    vegetation.initial_grid(type=initial_state)
+    vegetation = InvasiveVegetation(width, species_prop=(p_nat, 0.0))
     fig, ax = plot_grid(vegetation)
 
     fig.savefig("veg_grid.png", dpi=300)
@@ -93,7 +93,7 @@ def run_model(
 
 
 def run_model_multiple(
-    vegetation,
+    width,
     p_nat,
     pp_inv,
     timespan=40,
@@ -102,7 +102,9 @@ def run_model_multiple(
     inv_type="random",
 ):
     if initial_state == "equilibrium":
-        vegetation.initial_grid(type=initial_state)
+        vegetation = InvasiveVegetation(width, species_prop=(p_nat, 0.0))
+
+        # vegetation.initial_grid(type=initial_state)
         t = 0
         total_cells = vegetation.width * vegetation.width
 
@@ -168,7 +170,8 @@ def run_model_multiple(
         plt.show()
 
     elif initial_state == "random":
-        vegetation.initial_grid(type=initial_state)
+        vegetation = InvasiveVegetation(width, species_prop=(0.25, 0.25))
+        # vegetation.initial_grid(type=initial_state)
         t = 0
         total_cells = vegetation.width * vegetation.width
 
@@ -240,10 +243,7 @@ if __name__ == "__main__":
     width = 64
     runs = 5
 
-    vegetation = InvasiveVegetation(width)
-    # run_model(vegetation, initial_state='equilibrium')
-
     pp_inv = np.linspace(0, 1, runs, endpoint=False)
     run_model_multiple(
-        vegetation, 0.25, pp_inv, timespan=timespan, initial_state="equilibrium"
+        width, 0.25, pp_inv, timespan=timespan, initial_state="equilibrium"
     )

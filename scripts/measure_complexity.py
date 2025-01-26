@@ -16,10 +16,11 @@ def main():
     # Prepare states
     WIDTH = 64
     p = 0.5
+
     weight = (3, 4, 6, 8, 9, 10, 11, 13, 17)
-    models = [Vegetation(WIDTH, positive_factor=w) for w in weight]
+    models = [Vegetation(WIDTH, positive_factor=w, alive_prop=p) for w in weight]
+
     for m in models:
-        m.initial_grid(p)
         for _ in trange(50):
             m.update()
 

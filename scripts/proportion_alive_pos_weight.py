@@ -12,8 +12,7 @@ iterations_list = []
 alive_list = []
 
 for pos_weight in pos_weight_list:
-    vegetation = Vegetation(width)
-    vegetation.initial_grid(p=0.5)
+    vegetation = Vegetation(width, alive_prop=0.5)
     vegetation.positive_factor = pos_weight
     Vegetation.find_steady_state(vegetation, 1000)
     alive_list.append(vegetation.proportion_alive_list)

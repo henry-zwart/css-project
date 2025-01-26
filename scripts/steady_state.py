@@ -8,8 +8,7 @@ from css_project.vegetation import Vegetation
 
 
 width = 64
-vegetation = Vegetation(width)
-vegetation.initial_grid(0.3)
+vegetation = Vegetation(width, alive_prop=0.3)
 t = 0
 total_cells = width * width
 
