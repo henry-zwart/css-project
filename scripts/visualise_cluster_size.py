@@ -58,7 +58,8 @@ if __name__ == "__main__":
 
     # Use powerlaw package to fit the data
     results = powerlaw.Fit(clusters)
-
+    print(results.power_law.alpha)
+    print(results.power_law.xmin)
     # Plot of probability density function and power law
     plt.figure(figsize=(8, 6))
     results.plot_pdf(label="Cluster Size Data")
