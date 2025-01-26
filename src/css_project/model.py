@@ -123,21 +123,15 @@ class VegetationModel(ABC):
             A list of (row, column) tuples describing the grid locations of
             the given cell's neighbors.
         """
-        indexes = []
 
-        left = -1 * radius
-        right = radius + 1
-
-        for delta_y in range(left, right):
-            if y + delta_y < 0 or y + delta_y > self.width - 1:
-                continue
-            for delta_x in range(left, right):
-                if x + delta_x < 0 or x + delta_x > self.width - 1:
-                    continue
-                if delta_x == 0 and delta_y == 0:
-                    continue
-                indexes.append([x + delta_x, y + delta_y])
-
+        indexes = [
+            [x + dx, y + dy]
+            for dx in range(-radius, radius + 1)
+            for dy in range(-radius, radius + 1)
+            if (dx != 0 or dy != 0)
+            and 0 <= x + dx < self.width
+            and 0 <= y + dy < self.width
+        ]
         return indexes
 
     def total_alive(self) -> int:
