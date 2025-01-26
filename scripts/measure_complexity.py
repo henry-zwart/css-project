@@ -16,7 +16,7 @@ def main():
     # Prepare states
     WIDTH = 64
     p = 0.5
-    weight = (3, 4, 6, 8, 10, 13, 17)
+    weight = (3, 4, 6, 8, 9, 10, 11, 13, 17)
     models = [Vegetation(WIDTH, positive_factor=w) for w in weight]
     for m in models:
         m.initial_grid(p)
@@ -69,10 +69,11 @@ def main():
     fig.savefig("cluster_complexity.png", dpi=500)
 
     # Plot the grids
-    for m in models:
-        fig, _ = plot_grid(m)
-        fig.suptitle(f"Positive weight: {m.positive_factor}")
-        fig.savefig(f"complexity_{m.positive_factor}.png")
+    fig, axes = plt.subplots(3, 3, figsize=(8, 8), layout="constrained")
+    for m, ax in zip(models, axes.flatten(), strict=True):
+        _ = plot_grid(m, ax=ax)
+        ax.set_title(f"Positive weight: {m.positive_factor}")
+    fig.savefig("complexity_states_example.png", dpi=500)
 
 
 if __name__ == "__main__":

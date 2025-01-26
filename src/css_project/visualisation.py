@@ -2,6 +2,7 @@ import matplotlib.animation as animation
 import matplotlib.colors as mpc
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.axes import Axes
 
 from css_project.fine_grained import FineGrained
 
@@ -18,13 +19,16 @@ QUALITATIVE_COLOURS = [
 ]
 
 
-def plot_grid(ca: GameOfLife):
+def plot_grid(ca: GameOfLife, ax: Axes | None = None):
     """Plot the static state of a cellular automaton grid.
 
     Assumes a square grid. Cells are coloured according to a
     qualitative colour pallete.
     """
-    fig, ax = plt.subplots(figsize=(6.5, 6.5), layout="constrained")
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(6.5, 6.5), layout="constrained")
+    else:
+        fig = None
     ax.set_axis_off()
     palette = mpc.ListedColormap(
         [QUALITATIVE_COLOURS[i] for i in sorted(np.unique(ca.grid))]
