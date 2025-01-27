@@ -121,6 +121,8 @@ class InvasiveVegetation(VegetationModel):
         self.neg_factor_nat = neg_factor_nat
         self.pos_factor_inv = pos_factor_inv
         self.neg_factor_inv = neg_factor_inv
+        self.close_kernel = neighbour_count_kernel(small_radius)
+        self.far_kernel = neighbour_count_kernel(large_radius)
 
     @property
     def n_states(self) -> int:
@@ -130,60 +132,89 @@ class InvasiveVegetation(VegetationModel):
         if type == "random":
             random_matrix = np.random.random(self.grid.shape)
             self.grid[np.where(random_matrix <= p_inv)] = 2
+        else:
+            raise ValueError("No valid type for invasive introduction")
+
+    def compute_feedback(
+        self,
+        positive_factor,
+        n_close: np.ndarray,
+        n_far_nat: np.ndarray,
+        n_far_inv: np.ndarray,
+    ) -> np.ndarray:
+        """Calculate feedback as a linear combination of neighbour frequencies.
+
+        The feedback is rounded toward zero, and clipped to be in the range [-1, 1].
+        Values after rounding and clipping are:
+        - -1, if feedback <= -1
+        - 0, if -1 < feedback < 1
+        - 1, if 1 <= feedback
+
+        Args:
+            n_close: For each cell, the number of nearby neighbors.
+            n_far: For each cell, the number of distance neighbors.
+
+        Returns:
+            The feedback value for each cell in the grid.
+        """
+        raw_feedback = positive_factor * n_close - (
+            (n_far_nat * self.neg_factor_nat) + (n_far_inv * self.neg_factor_inv)
+        )
+
+        return np.clip(np.fix(raw_feedback), -1, 1).astype(int)
 
     def update(self):
-        temp_grid = np.empty_like(self.grid)
+        close_neighbours_nat = count_neighbours(self.grid == 1, self.close_kernel)
+        close_neighbours_inv = count_neighbours(self.grid == 2, self.close_kernel)
 
-        for y in range(self.width):
-            for x in range(self.width):
-                # Find local neighbors and calculate sum
-                close = self.find_neighbors(y, x, self.small_radius)
-                close_nat, close_inv = self.find_states(close)
+        # since some states are 2, will it be disproportionally doubled now?
+        far_neighbours_nat = count_neighbours(self.grid == 1, self.far_kernel)
+        far_neighbours_inv = count_neighbours(self.grid == 2, self.far_kernel)
 
-                # Find non-local neighbors and calculate sum
-                far = self.find_neighbors(y, x, self.large_radius)
-                far_nat, far_inv = self.find_states(far)
+        feedback_nat = self.compute_feedback(
+            self.pos_factor_nat,
+            close_neighbours_nat,
+            far_neighbours_nat,
+            far_neighbours_inv,
+        )
 
-                # Calculate negative feedback
-                neg_feedback = self.neg_factor_nat * far_nat
+        feedback_inv = self.compute_feedback(
+            self.pos_factor_inv,
+            close_neighbours_inv,
+            far_neighbours_nat,
+            far_neighbours_inv,
+        )
 
-                # Calculate positive and negative feedback
-                feedback_nat = self.pos_factor_nat * close_nat - (
-                    neg_feedback + (self.neg_factor_inv * far_inv)
-                )
+        # Cell states
+        dead_cell = self.grid == 0
+        native_cell = self.grid == 1
+        invasive_cell = self.grid == 2
 
-                feedback_inv = self.pos_factor_inv * close_inv - (
-                    neg_feedback + (self.neg_factor_inv * far_inv)
-                )
+        # Feedback statements
+        feedback_nat_eq_inv = feedback_nat == feedback_inv
+        feedback_nat_gt_0 = feedback_nat > 0
+        feedback_inv_gt_0 = feedback_inv > 0
+        feedback_nat_st_0 = feedback_nat < 0
+        feedback_inv_st_0 = feedback_inv < 0
+        feedback_nat_gt_inv = feedback_nat > feedback_inv
+        feedback_inv_gt_nat = feedback_inv > feedback_nat
 
-                # Empty cell
-                if self.grid[y, x] == 0:
-                    if feedback_nat == feedback_inv and feedback_nat > 0:
-                        temp_grid[y, x] = np.random.choice((1, 2))
-                    elif feedback_nat > 0 and feedback_nat > feedback_inv:
-                        temp_grid[y, x] = 1
-                    elif feedback_inv > 0 and feedback_inv > feedback_nat:
-                        temp_grid[y, x] = 2
-                    else:
-                        temp_grid[y, x] = 0
+        # Find cells where we need to choose between 1 and 2
+        cells_eq = (dead_cell & feedback_nat_eq_inv & feedback_nat_gt_0).sum()
+        random_nrs = np.random.random(cells_eq)
+        self.grid[dead_cell & feedback_nat_eq_inv & feedback_nat_gt_0] = np.where(
+            random_nrs < 0.5, 1, 2
+        )
 
-                # Native cell
-                elif self.grid[y, x] == 1:
-                    # Cell dies
-                    if feedback_nat < 0:
-                        temp_grid[y, x] = 0
-                    else:
-                        temp_grid[y, x] = 1
+        # Other updates for Dead cells
+        self.grid[dead_cell & feedback_nat_gt_0 & feedback_nat_gt_inv] = 1
+        self.grid[dead_cell & feedback_inv_gt_0 & feedback_inv_gt_nat] = 2
 
-                # Invasive cell
-                elif self.grid[y, x] == 2:
-                    # Cell dies
-                    if feedback_inv < 0:
-                        temp_grid[y, x] = 0
-                    else:
-                        temp_grid[y, x] = 2
+        # Updates for native cells
+        self.grid[native_cell & feedback_nat_st_0] = 0
 
-        self.grid = temp_grid
+        # Updates for invasive cells
+        self.grid[invasive_cell & feedback_inv_st_0] = 0
 
 
 def count_neighbours(states: np.ndarray, kern: np.ndarray) -> np.ndarray:
@@ -201,4 +232,4 @@ def count_neighbours(states: np.ndarray, kern: np.ndarray) -> np.ndarray:
     cell. In the 3D case, separates these counts by species,
     returning a matrix of the same shape as the input array.
     """
-    return signal.convolve2d(states, kern, mode="same", boundary="fill")
+    return signal.convolve(states, kern, mode="same")

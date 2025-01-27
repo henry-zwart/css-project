@@ -238,12 +238,35 @@ def run_model_multiple(
     return
 
 
-if __name__ == "__main__":
-    timespan = 10
-    width = 64
-    runs = 5
+def run_new_model(width, species_prop):
+    vegetation = InvasiveVegetation(width, species_prop=(p_nat, 0.25))
+    fig, ax = plot_grid(vegetation)
+    fig.savefig("veg_grid.png", dpi=300)
 
-    pp_inv = np.linspace(0, 1, runs, endpoint=False)
-    run_model_multiple(
-        width, 0.25, pp_inv, timespan=timespan, initial_state="equilibrium"
-    )
+    initial_grid = vegetation.grid.copy()
+    t = 0
+
+    while t < timespan:
+        vegetation.update()
+        t += 1
+
+    # Reset grid to initial state
+    vegetation.grid = initial_grid.copy()
+
+    # Make animation of grid
+    ani = animate_ca(vegetation, timespan)
+    ani.save("vegetation_new.gif")
+
+
+if __name__ == "__main__":
+    timespan = 20
+    width = 64
+    p_nat = 0.25
+    # runs = 5
+
+    run_new_model(width, species_prop=(0.25, 0.25))
+
+    # pp_inv = np.linspace(0, 1, runs, endpoint=False)
+    # run_model_multiple(
+    #     width, 0.25, pp_inv, timespan=timespan, initial_state="equilibrium"
+    # )
