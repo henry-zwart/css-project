@@ -121,6 +121,8 @@ class InvasiveVegetation(VegetationModel):
         self.neg_factor_nat = neg_factor_nat
         self.pos_factor_inv = pos_factor_inv
         self.neg_factor_inv = neg_factor_inv
+        self.close_kernel = neighbour_count_kernel(small_radius)
+        self.far_kernel = neighbour_count_kernel(large_radius)
 
     @property
     def n_states(self) -> int:
@@ -131,10 +133,74 @@ class InvasiveVegetation(VegetationModel):
             random_matrix = np.random.random(self.grid.shape)
             self.grid[np.where(random_matrix <= p_inv)] = 2
 
-    def update(self):
-        temp_grid = np.empty_like(self.grid)
+    def compute_feedback(
+        self,
+        positive_factor,
+        n_close: np.ndarray,
+        n_far_nat: np.ndarray,
+        n_far_inv: np.ndarray,
+    ) -> np.ndarray:
+        """Calculate feedback as a linear combination of neighbour frequencies.
 
-        for y in range(self.width):
+        The feedback is rounded toward zero, and clipped to be in the range [-1, 1].
+        Values after rounding and clipping are:
+        - -1, if feedback <= -1
+        - 0, if -1 < feedback < 1
+        - 1, if 1 <= feedback
+
+        Args:
+            n_close: For each cell, the number of nearby neighbors.
+            n_far: For each cell, the number of distance neighbors.
+
+        Returns:
+            The feedback value for each cell in the grid.
+        """
+        raw_feedback = positive_factor * n_close - (
+            (n_far_nat * self.neg_factor_nat) + (n_far_inv * self.neg_factor_inv)
+        )
+
+        return np.clip(np.fix(raw_feedback), -1, 1).astype(int)
+
+    def update(self):
+        # Veg code (delete later)
+        # self.grid[feedback < 0] = 0
+        # self.grid[feedback > 0] = 1
+        #  self.proportion_alive_list.append(self.total_alive() / self.area)
+
+        # Start of code
+        close_neighbours_nat = count_neighbours(self.grid == 1, self.close_kernel)
+        close_neighbours_inv = count_neighbours(self.grid == 2, self.close_kernel)
+
+        # since some states are 2, will it be disproportionally doubled now?
+        far_neighbours_nat = count_neighbours(self.grid == 1, self.far_kernel)
+        far_neighbours_inv = count_neighbours(self.grid == 2, self.far_kernel)
+
+        feedback_nat = self.compute_feedback(
+            self.pos_factor_nat,
+            close_neighbours_nat,
+            far_neighbours_nat,
+            far_neighbours_inv,
+        )
+
+        feedback_inv = self.compute_feedback(
+            self.pos_factor_inv,
+            close_neighbours_inv,
+            far_neighbours_nat,
+            far_neighbours_inv,
+        )
+
+        feedback = feedback_inv + feedback_nat
+
+        if feedback > 0:
+            return
+
+        # Feedback statements
+
+        # feedback_nat_gt_0 = feedback_nat > 0
+        # locations_where_inv_gt_nat = feedback_inv > native
+        # self.grid[feedback_nat_gt_0 & locations_where_inv_gt_nat] = 1
+
+        """for y in range(self.width):
             for x in range(self.width):
                 # Find local neighbors and calculate sum
                 close = self.find_neighbors(y, x, self.small_radius)
@@ -145,7 +211,9 @@ class InvasiveVegetation(VegetationModel):
                 far_nat, far_inv = self.find_states(far)
 
                 # Calculate negative feedback
-                neg_feedback = self.neg_factor_nat * far_nat
+                neg_feedback = self.neg_factor_nat * far_nat + (
+                    self.neg_factor_inv * far_inv
+                )
 
                 # Calculate positive and negative feedback
                 feedback_nat = self.pos_factor_nat * close_nat - (
@@ -183,7 +251,7 @@ class InvasiveVegetation(VegetationModel):
                     else:
                         temp_grid[y, x] = 2
 
-        self.grid = temp_grid
+        self.grid = temp_grid"""
 
 
 def count_neighbours(states: np.ndarray, kern: np.ndarray) -> np.ndarray:
