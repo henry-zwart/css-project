@@ -132,6 +132,8 @@ class InvasiveVegetation(VegetationModel):
         if type == "random":
             random_matrix = np.random.random(self.grid.shape)
             self.grid[np.where(random_matrix <= p_inv)] = 2
+        else:
+            raise ValueError("No valid type for invasive introduction")
 
     def compute_feedback(
         self,
