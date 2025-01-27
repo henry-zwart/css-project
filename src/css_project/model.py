@@ -192,5 +192,10 @@ class VegetationModel(ABC):
             self.update()
 
     def run(self, iterations: int = 1000):
+        """Run the cellular automata for a specified number of iterations
+        Args:
+            iterations: number of iterations to be executed
+
+        """
         for _ in range(iterations):
             self.update()
