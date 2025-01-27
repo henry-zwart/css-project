@@ -11,9 +11,9 @@ from .simple_ca import GameOfLife
 QUALITATIVE_COLOURS = [
     "#CCBB44",
     "#228833",
+    "#AA3377",
     "#FFFFFF",
     "#4477AA",
-    "#AA3377",
     "#66CCEE",
     "#EE6677",
 ]
