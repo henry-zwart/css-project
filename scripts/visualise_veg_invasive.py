@@ -248,8 +248,8 @@ def heatmap_final_proportions(runs, width, timespan):
 
     t_eq = 20  # Change with steady state implementation
     i_values = np.linspace(0, 1, runs)
-    n_values = np.linspace(0.001, 0.1, runs)
-    heatmap = np.zeros((runs, runs))
+    n_values = [0.0001, 0.0005, 0.001, 0.005, 0.01]
+    heatmap = np.zeros((len(n_values), len(i_values)))
     alive_nat = []
     # alive_inv = []
 
@@ -296,16 +296,22 @@ def heatmap_final_proportions(runs, width, timespan):
     plt.xlabel("Invasive Species Initial Concentration Probability")
     plt.ylabel("Native Species Initial Concentration Probability")
     plt.title("Impact of Invasive Species on Native Species (Heatmap)")
+    plt.savefig("heatmap_nat_final_conc.png", dpi=300)
     plt.show()
 
     # Scatter c parameter, with native at eq on y-axis
+
     # eq - final
+
+    # phase changes after introduction
+    # graph 1 shows start towards eq, graph 2 (connected) shows trend
+    # after introduction invasive (one set of proportions)
 
 
 if __name__ == "__main__":
     timespan = 10
     width = 64
-    runs = 5
+    runs = 25
 
     heatmap_final_proportions(runs, width, timespan)
 
