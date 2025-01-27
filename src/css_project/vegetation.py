@@ -232,4 +232,4 @@ def count_neighbours(states: np.ndarray, kern: np.ndarray) -> np.ndarray:
     cell. In the 3D case, separates these counts by species,
     returning a matrix of the same shape as the input array.
     """
-    return signal.convolve2d(states, kern, mode="same", boundary="fill")
+    return signal.convolve(states, kern, mode="same")

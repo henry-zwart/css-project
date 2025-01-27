@@ -95,45 +95,6 @@ class VegetationModel(ABC):
 
         self.grid = grid
 
-    def find_states(self, neighbors) -> list[int]:
-        """Count the occurrences of the model species' in a set of grid indexes.
-
-        Args:
-            neighbors: A list of indexes in the grid.
-
-        Returns:
-            A list of occurrences, ordered by species identifier.
-        """
-        counts = [0 for _ in range(self.n_states)]
-        for row, column in neighbors:
-            for s in range(1, self.n_states):
-                counts[s] += self.grid[row, column] == s
-
-        return counts[1:]
-
-    def find_neighbors(self, x: int, y: int, radius: int) -> list[list[int]]:
-        """Determine the indexes within a given radius of a grid cell.
-
-        Args:
-            x: Grid cell row.
-            y: Grid cell column.
-            radius: Radius within which to identify neighbors.
-
-        Returns:
-            A list of (row, column) tuples describing the grid locations of
-            the given cell's neighbors.
-        """
-
-        indexes = [
-            [x + dx, y + dy]
-            for dx in range(-radius, radius + 1)
-            for dy in range(-radius, radius + 1)
-            if (dx != 0 or dy != 0)
-            and 0 <= x + dx < self.width
-            and 0 <= y + dy < self.width
-        ]
-        return indexes
-
     def total_alive(self) -> int:
         """Count the total number of living cells in the grid.
 
