@@ -190,3 +190,7 @@ class VegetationModel(ABC):
             if self.is_steady_state():
                 break
             self.update()
+
+    def run(self, iterations: int = 1000):
+        for _ in range(iterations):
+            self.update()
