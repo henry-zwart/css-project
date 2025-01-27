@@ -1,6 +1,7 @@
 import numpy as np
 
 NEIGHBOUR_COUNT = np.array([[1, 1, 1], [1, 0, 1], [1, 1, 1]], dtype=np.int64)
+NEIGHBOUR_COUNT_R6 = np.ones((13, 13), dtype=np.int64)
 NEIGHBOUR_COUNT_3D = NEIGHBOUR_COUNT[None, ...]
 
 """Only Moore neighbourhood supported for now."""
