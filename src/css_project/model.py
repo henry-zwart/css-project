@@ -177,7 +177,6 @@ class VegetationModel(ABC):
                 - 2 * self.proportion_alive_list[-11]
             )
             if abs(der) < threshold and abs(der_2) < threshold:
-                print(f"difference: {der}, second order difference: {der}")
                 return True
         return False
 
@@ -187,8 +186,7 @@ class VegetationModel(ABC):
         Args:
             iterations: Maximum number of iterations before termination.
         """
-        for iter in range(iterations):
+        for _ in range(iterations):
             if self.is_steady_state():
-                print(f"Iteration: {iter}")
                 break
             self.update()
