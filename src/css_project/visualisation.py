@@ -3,8 +3,11 @@ import matplotlib.colors as mpc
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.axes import Axes
+from matplotlib.pyplot import cm
 
 from css_project.fine_grained import FineGrained
+
+from .vegetation import Vegetation
 
 from .simple_ca import GameOfLife
 
@@ -109,3 +112,66 @@ def animate_nutrients(ca: FineGrained, steps: int, fps: int = 5):
     )
 
     return ani
+
+def phase_transition_pos_weight(width, pos_weight_list):
+    alive_list = []
+
+    for pos_weight in pos_weight_list:
+        vegetation = Vegetation(width, alive_prop=0.5)
+        vegetation.positive_factor = pos_weight
+        Vegetation.find_steady_state(vegetation, 1000)
+        alive_list.append(vegetation.proportion_alive_list)
+
+    steady_alive_list = [x[-1] for x in alive_list]
+
+    fig = plt.figure(figsize=(8, 6))
+    plt.scatter(pos_weight_list, steady_alive_list)
+    plt.title("Proportion of Alive Cells vs Positive Weight")
+    plt.xlabel("Positive Weight")
+    plt.ylabel("Proportion of Alive Cells at Steady State")
+
+    return fig
+    
+def phase_transition_prob(width, p_list, pos_weight_list: int | list[int]):
+    # Plot of starting probability vs number of alive cells at equilibrium
+    fig2 = plt.figure(figsize=(8, 6))
+    plt.xscale("log")
+    plt.title("Proportion of Alive Cells vs Iterations")
+    plt.xlabel("Initial Probability")
+    plt.ylabel("Proportion of Alive Cells at Steady State")
+
+    if isinstance(pos_weight_list, int):
+        pos_weight_list = [pos_weight_list]
+
+    for pos_weight in pos_weight_list: 
+        iterations_list = []
+        alive_list = []   
+        for p in p_list:
+            vegetation = Vegetation(width, positive_factor=pos_weight, alive_prop=p)
+            vegetation.find_steady_state(1000)
+            iterations = list(range(len(vegetation.proportion_alive_list)))
+            alive_list.append(vegetation.proportion_alive_list)
+            iterations_list.append(iterations)
+
+        steady_alive_list = [x[-1] for x in alive_list]
+
+        plt.scatter(p_list, steady_alive_list, label="Pos. Weight=%d" % (pos_weight))
+    plt.legend()
+
+    # Plot of proportion alive cells vs number of iterations for multiple starting probabilities
+    fig1 = plt.figure(figsize=(8, 6))
+
+    num_of_lines = len(p_list)
+    color = iter(cm.cool(np.linspace(0, 1, num_of_lines)))
+
+    for i in range(len(p_list)):
+        c = next(color)
+        plt.plot(
+            iterations_list[i], alive_list[i], c=c, linestyle="-", label=f"{p_list[i]}"
+        )
+
+    plt.title("Proportion of Alive Cells vs Iterations")
+    plt.xlabel("Time Step")
+    plt.ylabel("Proportion of Alive Cells at Steady State")
+
+    return fig1, fig2
