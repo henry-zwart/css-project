@@ -63,21 +63,41 @@ def main():
         max_clusters.append(prob_max_clusters)
         ratio_clusters.append(prob_ratio_clusters)
 
-    print(ratio_clusters)
     alive_grid = np.array(alive_grid)
     cluster_count = np.array(cluster_count)
     max_clusters = np.array(max_clusters)
     ratio_clusters = np.array(ratio_clusters)
     ratio_clusters[ratio_clusters == np.inf] = np.nan
 
+    num_ticks = 10
+    # the index of the position of yticks
+    xticks = np.linspace(0, len(initial_probs) - 1, num_ticks, dtype=np.int32)
+    # the content of labels of these yticks
+    xticklabels = [initial_probs[idx] for idx in xticks]
+    xticklabels = [round(f, 3) for f in xticklabels]
+
     fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(8, 6), layout="constrained")
     sns.heatmap(
         alive_grid, cmap="viridis", xticklabels=[], yticklabels=positives, ax=axes[0, 0]
     )
-    sns.heatmap(cluster_count, cmap="viridis", ax=axes[0, 1])
-    sns.heatmap(max_clusters, cmap="viridis", ax=axes[1, 0])
-    sns.heatmap(ratio_clusters, cmap="viridis", ax=axes[1, 1])
-
+    sns.heatmap(
+        cluster_count, xticklabels=[], yticklabels=[], cmap="viridis", ax=axes[0, 1]
+    )
+    sns.heatmap(
+        max_clusters,
+        xticklabels=xticklabels,
+        yticklabels=positives,
+        cmap="viridis",
+        ax=axes[1, 0],
+    )
+    sns.heatmap(
+        ratio_clusters,
+        xticklabels=xticklabels,
+        yticklabels=[],
+        cmap="viridis",
+        ax=axes[1, 1],
+    )
+    axes[0, 1].set_xticklabels([])
     axes[0, 0].set_title("Cell density")
     axes[0, 1].set_title("Cluster count")
     axes[1, 0].set_title("Maximum size of a cluster")
