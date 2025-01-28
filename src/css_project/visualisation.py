@@ -114,6 +114,9 @@ def animate_nutrients(ca: FineGrained, steps: int, fps: int = 5):
     return ani
 
 def phase_transition_pos_weight(width, pos_weight_list):
+    """Creates a plot which calculates the density at equilibrium 
+        for a list of positive weights (control). 
+    """
     alive_list = []
 
     for pos_weight in pos_weight_list:
@@ -133,6 +136,15 @@ def phase_transition_pos_weight(width, pos_weight_list):
     return fig
     
 def phase_transition_prob(width, p_list, pos_weight_list: int | list[int]):
+    """Creates a plot which calculates the density at equilibrium given
+        an initial probability to observe a phase transition. 
+
+        This function can make the graph for a list of positive weights 
+        to observe the phase transitions for different positive weights.
+
+        Furthermore a plot is created which shows the density of alive cells
+        over time given the initial probability. 
+    """
     # Plot of starting probability vs number of alive cells at equilibrium
     fig2 = plt.figure(figsize=(8, 6))
     plt.xscale("log")
@@ -177,7 +189,9 @@ def phase_transition_prob(width, p_list, pos_weight_list: int | list[int]):
     return fig1, fig2
 
 def densities_invasive_logistic(width, random_seed, p):
-  
+    """ Creates a plot for the density of both native and invasive species 
+    over time in the logistic model. The invasive species is added
+    after a steady state is reached. """
     # Run model until steady state
     model = Logistic(width, random_seed=random_seed)
     model.find_steady_state(1000)
@@ -212,26 +226,23 @@ def densities_invasive_logistic(width, random_seed, p):
 
     return fig1
 
-def densities_invasive_coursegrained(width, p_inv):
-  
+def densities_invasive_coarsegrained(width, p_nat, p_inv):
+    """ Creates a plot for the density of both native and invasive species 
+    over time in the coarse-grained model. The invasive species is added
+    after a steady state is reached. """
     # Run model until steady state
-    model = Vegetation(width)
-    model.find_steady_state(100)
-
-    equilibrium_state = model.grid
-
-    # Introduce invasive species
-    invasive_model = InvasiveVegetation(width)
-    invasive_model.grid = equilibrium_state
+    model = InvasiveVegetation(width, species_prop=(p_nat, 0))
+    model.run(100)
+   
     
-    invasive_model.introduce_invasive(p_inv=p_inv)
+    model.introduce_invasive(p_inv=p_inv)
 
-    invasive_model.find_steady_state(100)
+    model.run(100)
 
     # Calculate proportions of native, invasive and empty cells
-    native = model.proportion_alive_list + invasive_model.proportion_native_alive_list
-    invasive = [0] * len(model.proportion_alive_list) + invasive_model.proportion_invasive_alive_list
-    iterations = list(range(len(model.proportion_alive_list)+len(invasive_model.proportion_native_alive_list)))
+    native = model.proportion_native_alive_list
+    invasive = model.proportion_invasive_alive_list
+    iterations = list(range(len(model.proportion_native_alive_list)))
 
     dead = [1-x for x in [a + b for a, b in zip(native, invasive)]]
 
@@ -246,6 +257,5 @@ def densities_invasive_coursegrained(width, p_inv):
     plt.xlabel("Time Step")
     plt.ylabel("Proportion of Species")
     plt.legend()
-
 
     return fig1
