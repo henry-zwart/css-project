@@ -56,6 +56,11 @@ class VegetationModel(ABC):
         """
         ...
 
+    @abstractmethod
+    def set_control(self, value: float):
+        """Update control parameter."""
+        ...
+
     def initial_grid(self, p: float | np.ndarray | list[float], type="random"):
         """Initialise species' populations in the grid.
 

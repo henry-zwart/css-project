@@ -297,6 +297,7 @@ def distribution_leftright_steps(
 
 
 def logistic_phase_plot(
+    model_type,
     width: int,
     init_density: float,
     init_nutrient: float,
@@ -331,9 +332,9 @@ def logistic_phase_plot(
 
     for repeat in trange(n_repeats):
         # Run model till equilibrium
-        model = Logistic(
+        model = model_type(
             width,
-            supplement_rate=init_nutrient,
+            control=init_nutrient,
             alive_prop=init_density,
             random_seed=None,
         )
@@ -355,7 +356,7 @@ def logistic_phase_plot(
 
         # Vary control parameter upward
         for i, ns in enumerate(nutrient_vals[left_steps:], start=left_steps):
-            model.supplement_rate = ns
+            model.set_control(ns)
             model.run(iters_per_step)
             equilibrium_density[repeat, i] = model.proportion_alive()
             equilibrium_cluster_ratio[repeat, i] = ratio_cluster_size(model.grid)

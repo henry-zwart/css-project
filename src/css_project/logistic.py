@@ -32,6 +32,9 @@ class Logistic(VegetationModel):
     def n_states(self) -> int:
         return 2
 
+    def set_control(self, value):
+        self.supplement_rate = value
+
     def calculate_competition(self, nearby_vegetation: np.ndarray) -> np.ndarray:
         return 1 - (self.consume_rate * nearby_vegetation) / (
             self.supplement_rate * self.N_NEIGHBOURS

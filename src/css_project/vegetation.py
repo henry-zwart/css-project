@@ -26,7 +26,7 @@ class Vegetation(VegetationModel):
             neighbors for negative feedback.
     """
 
-    positive_factor: int
+    positive_factor: float
     negative_factor: int
     close_kernel: np.ndarray
     far_kernel: np.ndarray
@@ -40,6 +40,7 @@ class Vegetation(VegetationModel):
         negative_factor: int = 1,
         init_method="random",
         alive_prop: float = 0.5,
+        random_seed = None
     ):
         """Initialise the Vegetation cellular automata model.
 
@@ -64,6 +65,9 @@ class Vegetation(VegetationModel):
     def n_states(self) -> int:
         """Number of states in the model."""
         return 2
+    
+    def set_control(self, value):
+        self.positive_factor = value
 
     def compute_feedback(self, n_close: np.ndarray, n_far: np.ndarray) -> np.ndarray:
         """Calculate feedback as a linear combination of neighbour frequencies.
