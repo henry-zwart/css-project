@@ -259,38 +259,46 @@ def run_new_model(width, species_prop):
 
 
 def eq_after_inv(width, p_nat):
-    """Let the native species reach equilibrium without any invasive
-    Introduce invasive species at some density
-    Let the system reach a new equilibrium
-    Measure the new density of the native species
-    Do this for a particular initial native density and control parameter.
-    Repeat for different parameters which give qualitatively different native
-    equilibrium states (i.e. different patterns/densities).
+    count = 0
+    density_after_list = []
+    density_after_listt = []
 
-    Plot:
-    Plot type: Line
-    x-axis: Density of introduced invasive
-    y-axis: Density of native at new equilibrium
-    Different lines: Different parameters for the native population
-    """
-    vegetation = InvasiveVegetation(width, species_prop=(p_nat, 0))
-    vegetation.run()
-    initial_grid = vegetation.grid.copy()
+    pp_inv = np.linspace(0, 1, 100)
 
-    # count = 0
-    for p_inv in np.linspace(0, 1, 100):
-        # introduce invasive
-        # print("Count: ", count)
-        # count += 1
+    for _ in range(0, 5):
+        vegetation = InvasiveVegetation(width, species_prop=(p_nat, 0))
+        vegetation.run()
+        initial_grid = vegetation.grid.copy()
+        total_cells = vegetation.area
+        for p_inv in pp_inv:
+            # Introduce invasive
+            count += 1
+            print("Count: ", count)
 
-        vegetation.introduce_invasive(p_inv)
-        vegetation.run(iterations=100)
-        vegetation.grid = initial_grid.copy()
+            vegetation.introduce_invasive(p_inv)
+            vegetation.run(iterations=500)
+            density_after_list.append(vegetation.species_alive()[0] / total_cells)
+            vegetation.grid = initial_grid.copy()
+
+        density_after_listt.append(density_after_list)
+        density_after_list = []
+
+    density_after_listt = np.asarray(density_after_listt)
+    density_after_avg = density_after_listt.mean(axis=0)
+
+    plt.figure(figsize=(10, 8))
+    plt.plot(pp_inv, density_after_avg, linestyle="-", label="Density Native species")
+    plt.title("Density of Native species After Equilibrium")
+    plt.xlabel("Introduced Proportion of Invasive Species")
+    plt.ylabel("Proportion of Native Species")
+    plt.ylim(0, max(density_after_avg) + 0.05)
+    plt.savefig("proportion_nat_inv_eq.png", dpi=300)
+    plt.show()
 
 
 if __name__ == "__main__":
     timespan = 20
-    width = 64
+    width = 128
     p_nat = 0.25
 
     eq_after_inv(width, p_nat)
