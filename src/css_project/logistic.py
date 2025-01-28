@@ -1,4 +1,5 @@
 import numpy as np
+from numba import njit
 from numpy.random import default_rng
 from scipy import signal
 
@@ -6,8 +7,36 @@ from . import kernel
 from .model import VegetationModel
 
 
+@njit
+def calculate_transition_probabilities(
+    grid, nearby_count, competition, N_NEIGHBOURS, DELTA_T_R
+):
+    """Numba-optimized computation of transition probabilities."""
+    rows, cols = grid.shape
+    transition_prob = np.zeros_like(grid, dtype=np.float64)
+
+    for i in range(rows):
+        for j in range(cols):
+            if grid[i, j] == 0:  # Unoccupied
+                if competition[i, j] >= 0:
+                    transition_prob[i, j] = (
+                        DELTA_T_R
+                        * (nearby_count[i, j] / (N_NEIGHBOURS - nearby_count[i, j]))
+                        * competition[i, j]
+                    )
+                else:
+                    transition_prob[i, j] = 0
+            else:  # Occupied
+                if competition[i, j] < 0:
+                    transition_prob[i, j] = 1 + DELTA_T_R * competition[i, j]
+                else:
+                    transition_prob[i, j] = 1
+
+    return np.clip(transition_prob, 0, 1)
+
+
 class Logistic(VegetationModel):
-    N_NEIGHBOURS = 13 * 13
+    N_NEIGHBOURS = kernel.NEIGHBOUR_COUNT_R6.sum()
 
     grid: np.ndarray
     nutrients: np.ndarray
@@ -41,36 +70,25 @@ class Logistic(VegetationModel):
         )
 
     def update(self):
-        """Update grid state according to transition rules.
-
-        Order of operations:
-        1. Consume nutrients. If nutrient level insufficient --> die.
-        2. Vegetation spreads to nearby cells.
-        3. Diffuse nutrients.
-        """
+        """Update grid state according to transition rules."""
         nearby_count = count_neighbours(self.grid)
         competition = self.calculate_competition(nearby_count)
-
-        is_occupied = self.grid == 1
-        DELTA_T = 0.05
-        R = 2
-        self.transition_prob[~is_occupied] = np.where(
-            competition[~is_occupied] >= 0,
-            DELTA_T
-            * R
-            * (
-                nearby_count[~is_occupied]
-                / (self.N_NEIGHBOURS - nearby_count[~is_occupied])
-            )
-            * competition[~is_occupied],
-            0,
+        DELTA_T_R = 0.5 * 2
+        self.transition_prob = calculate_transition_probabilities(
+            self.grid, nearby_count, competition, self.N_NEIGHBOURS, DELTA_T_R
         )
-        self.transition_prob[is_occupied] = 1 - np.where(
-            competition[is_occupied] < 0, -DELTA_T * R * competition[is_occupied], 0
-        )
-        self.grid = self.rng.binomial(1, self.transition_prob)
 
+        # Update the grid using the transition probabilities
+        non_zero_prob = self.transition_prob > 0
+        self.grid[non_zero_prob] = self.rng.binomial(
+            1, self.transition_prob[non_zero_prob]
+        )
+
+        # Record proportion of alive cells
         self.proportion_alive_list.append(self.total_alive() / self.area)
+
+        # Reset transition probabilities
+        self.transition_prob.fill(0)
 
 
 class LogisticTwoNative(VegetationModel):
@@ -192,18 +210,8 @@ def count_neighbours(states: np.ndarray) -> np.ndarray:
     cell. In the 3D case, separates these counts by species,
     returning a matrix of the same shape as the input array.
     """
-    match states.ndim:
-        case 2:
-            return signal.convolve(
-                states,
-                kernel.NEIGHBOUR_COUNT_R6,
-                mode="same",
-            )
-        case 3:
-            return signal.convolve(
-                states,
-                kernel.NEIGHBOUR_COUNT_3D,
-                mode="same",
-            )
-        case _:
-            raise ValueError("Grid shape should be either 2 or 3 dimensions.")
+    return signal.convolve(
+        states,
+        kernel.NEIGHBOUR_COUNT_R6,
+        mode="same",
+    )
