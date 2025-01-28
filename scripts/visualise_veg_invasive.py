@@ -244,16 +244,10 @@ def run_model_multiple(
 
 
 def run_new_model(width, species_prop):
-    vegetation = InvasiveVegetation(width, species_prop=(p_nat, 0.25))
-    fig, ax = plot_grid(vegetation)
-    fig.savefig("veg_grid.png", dpi=300)
+    vegetation = InvasiveVegetation(width, species_prop=(p_nat, 0))
+    vegetation.run()
 
     initial_grid = vegetation.grid.copy()
-    t = 0
-
-    while t < timespan:
-        vegetation.update()
-        t += 1
 
     # Reset grid to initial state
     vegetation.grid = initial_grid.copy()
