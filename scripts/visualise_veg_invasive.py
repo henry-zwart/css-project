@@ -258,13 +258,45 @@ def run_new_model(width, species_prop):
     ani.save("vegetation_new.gif")
 
 
+def eq_after_inv(width, p_nat):
+    """Let the native species reach equilibrium without any invasive
+    Introduce invasive species at some density
+    Let the system reach a new equilibrium
+    Measure the new density of the native species
+    Do this for a particular initial native density and control parameter.
+    Repeat for different parameters which give qualitatively different native
+    equilibrium states (i.e. different patterns/densities).
+
+    Plot:
+    Plot type: Line
+    x-axis: Density of introduced invasive
+    y-axis: Density of native at new equilibrium
+    Different lines: Different parameters for the native population
+    """
+    vegetation = InvasiveVegetation(width, species_prop=(p_nat, 0))
+    vegetation.run()
+    initial_grid = vegetation.grid.copy()
+
+    # count = 0
+    for p_inv in np.linspace(0, 1, 100):
+        # introduce invasive
+        # print("Count: ", count)
+        # count += 1
+
+        vegetation.introduce_invasive(p_inv)
+        vegetation.run(iterations=100)
+        vegetation.grid = initial_grid.copy()
+
+
 if __name__ == "__main__":
     timespan = 20
     width = 64
     p_nat = 0.25
-    # runs = 5
 
-    run_new_model(width, species_prop=(0.25, 0.25))
+    eq_after_inv(width, p_nat)
+
+    # runs = 5
+    # run_new_model(width, species_prop=(0.25, 0.25))
 
     # pp_inv = np.linspace(0, 1, runs, endpoint=False)
     # run_model_multiple(
