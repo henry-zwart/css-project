@@ -373,10 +373,17 @@ def eq_after_inv(width, p_nat):
 
 if __name__ == "__main__":
     timespan = 20
-    width = 128
+    width = 30
     p_nat = 0.25
 
-    eq_after_inv(width, p_nat)
+    p_inv = 0.1
+
+    vegetation = InvasiveVegetation(width, species_prop=(p_nat, 0))
+    vegetation.run(iterations=2)
+    # vegetation.introduce_invasive(p_inv)
+    # vegetation.run(iterations=1)
+
+    # eq_after_inv(width, p_nat)
 
     # runs = 5
     # run_new_model(width, species_prop=(0.25, 0.25))
