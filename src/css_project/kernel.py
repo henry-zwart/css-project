@@ -1,8 +1,16 @@
 import numpy as np
 
 NEIGHBOUR_COUNT = np.array([[1, 1, 1], [1, 0, 1], [1, 1, 1]], dtype=np.int64)
-NEIGHBOUR_COUNT_R6 = np.ones((13, 13), dtype=np.int64)
 NEIGHBOUR_COUNT_3D = NEIGHBOUR_COUNT[None, ...]
+center = 6
+radius = 6
+x_offset = 0
+y_offset = 0
+y, x = np.ogrid[:13, :13]
+distance_from_origin = np.sqrt(
+    (x - (center + x_offset)) ** 2 + (y - (center + y_offset)) ** 2
+)
+NEIGHBOUR_COUNT_R6 = (distance_from_origin <= 6).astype(int)
 
 """Only Moore neighbourhood supported for now."""
 N_NEIGHBOURS = 8
