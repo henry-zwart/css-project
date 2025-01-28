@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from css_project.complexity import (
+    _get_cluster_sizes,
     count_clusters,
     fluctuation_cluster_size,
     maximum_cluster_size,
@@ -361,35 +362,71 @@ def eq_after_inv(width, p_nat):
 
 
 def find_phase_transition_cluster_count(width):
-    control = np.linspace(10.5, 11, 20)
+    control = np.linspace(8, 11.8, 100)
     number_of_clusters = []
 
     for c in control:
         vegetation = Vegetation(width, control=c)
-        vegetation.run()
+        vegetation.run(iterations=250)
         number_of_clusters.append(count_clusters(vegetation.grid))
 
     plt.figure(figsize=(10, 8))
-    plt.plot(control, number_of_clusters)
+    plt.scatter(control, number_of_clusters)
     plt.title("Number of clusters for different control")
     plt.xlabel("control")
     plt.ylabel("Number of clusters")
-
     plt.show()
 
-    # print("number of clusters: ", number_of_clusters)
-    # print("control: ", control)
 
-    return
+def plot_cluster_phase_transition(width):
+    control = np.linspace(10, 10.5, 10)
+    cluster_sizes_list = []
+    number_of_clusters = 0
+
+    for _ in range(0, 10):
+        for c in control:
+            vegetation = Vegetation(width, control=c)
+            vegetation.run(iterations=250)
+            cluster_sizes = np.asarray(_get_cluster_sizes(vegetation.grid)[1:])
+            number_of_clusters += count_clusters(vegetation.grid)
+            for cluster in cluster_sizes:
+                cluster_sizes_list.append(int(cluster))
+
+    min_cluster_size = np.min(cluster_sizes_list)
+    max_cluster_size = np.max(cluster_sizes_list)
+    count_at_size = []
+
+    current_size = min_cluster_size
+    while current_size <= max_cluster_size:
+        nr_at_size = np.sum(cluster_sizes_list == current_size)
+        if nr_at_size > 0:
+            count_at_size.append([int(current_size), int(nr_at_size)])
+        current_size += 1
+
+    print(count_at_size)
+
+    # print(cluster_sizes_list)
+    # print(number_of_clusters)
+
+    # iterate over cluster_sizes and count how many (and which) are similar
+    # order and divide how many by number of clusters (probability)
+
+    # Possible issues: sizes in similar ra nge but very different due to large
+    # range of possibilities with large grid
+
+    # Should we combine ranges?
 
 
 if __name__ == "__main__":
     timespan = 20
-    width = 128
+    width = 64
     p_nat = 0.25
     p_inv = 0.85
 
-    find_phase_transition_cluster_count(width)
+    control_param = 11.0
+
+    # find_phase_transition_cluster_count(width)
+    plot_cluster_phase_transition(width)
     # run_new_model(width, p_nat, p_inv)
 
     # vegetation = InvasiveVegetation(width, species_prop=(p_nat, 0))
