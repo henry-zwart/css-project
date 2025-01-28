@@ -2,6 +2,9 @@ import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 import numpy as np
 
+from css_project.complexity import (
+    maximum_cluster_size,
+)
 from css_project.vegetation import InvasiveVegetation
 from css_project.visualisation import animate_ca, plot_grid
 
@@ -258,14 +261,36 @@ def run_new_model(width, species_prop):
     ani.save("vegetation_new.gif")
 
 
+def eq_after_inv_cluster_plots(pp_inv, density_after_avg, equilibrium_max_cluster):
+    fig, axes = plt.subplots(
+        nrows=2, ncols=1, layout="constrained", figsize=(8, 10), sharex=True
+    )
+    # Plots the equilibrium density after introduction of invasive species
+    axes[0].plot(pp_inv, density_after_avg)
+    axes[0].set_ylabel("Equilibrium Density")
+    axes[0].set_ylim(0, max(density_after_avg) + 0.01)
+
+    # Plots the Giant component after introduction of invasive species
+    axes[1].plot(pp_inv, equilibrium_max_cluster)
+    axes[1].vlines(pp_inv, ymin=0, ymax=equilibrium_max_cluster)
+    axes[1].set_ylabel("Giant component")
+    axes[1].set_yscale("log")
+
+    plt.show()
+
+    return
+
+
 def eq_after_inv(width, p_nat):
     density_after = []
     density_after_list = []
+    equilibrium_max_cluster = []
+    equilibrium_max_cluster_list = []
 
     count = 0
-    pp_inv = np.linspace(0, 1, 100)
+    pp_inv = np.linspace(0, 1, 5)
 
-    for _ in range(0, 5):
+    for _ in range(0, 2):
         vegetation = InvasiveVegetation(width, species_prop=(p_nat, 0))
         vegetation.run()
         initial_grid = vegetation.grid.copy()
@@ -278,41 +303,34 @@ def eq_after_inv(width, p_nat):
 
             vegetation.introduce_invasive(p_inv)
             vegetation.run(iterations=500)
+
             density_after.append(vegetation.species_alive()[0] / total_cells)
+            equilibrium_max_cluster.append(maximum_cluster_size(vegetation.grid))
+
             vegetation.grid = initial_grid.copy()
 
         density_after_list.append(density_after)
         density_after = []
 
+        equilibrium_max_cluster_list.append(equilibrium_max_cluster)
+        equilibrium_max_cluster = []
+
     density_after_list = np.asarray(density_after_list)
     density_after_avg = density_after_list.mean(axis=0)
 
-    plt.figure(figsize=(10, 8))
+    equilibrium_max_cluster_list = np.asarray(equilibrium_max_cluster_list)
+    equilibrium_max_cluster_avg = equilibrium_max_cluster_list.mean(axis=0)
+
+    eq_after_inv_cluster_plots(pp_inv, density_after_avg, equilibrium_max_cluster_avg)
+
+    """plt.figure(figsize=(10, 8))
     plt.plot(pp_inv, density_after_avg, linestyle="-", label="Density Native species")
     plt.title("Density of Native species After Equilibrium")
     plt.xlabel("Introduced Proportion of Invasive Species")
     plt.ylabel("Proportion of Native Species")
     plt.ylim(0, max(density_after_avg) + 0.05)
     plt.savefig("proportion_nat_inv_eq.png", dpi=300)
-    plt.show()
-
-
-def eq_after_inv_cluster_plots(pp_inv, density_after_avg, equilibrium_max_cluster):
-    fig, axes = plt.subplots(
-        nrows=6, ncols=1, layout="constrained", figsize=(8, 10), sharex=True
-    )
-    # Plots the equilibrium density after introduction of invasive species
-    axes[0].plot(pp_inv, density_after_avg)
-    axes[0].set_ylabel("Equilibrium Density")
-    axes[0].set_ylim(0, max(density_after_avg) + 0.01)
-
-    # Plots the Giant component after introduction of invasive species
-    axes[1].plot(pp_inv, equilibrium_max_cluster.mean(axis=0))
-    axes[1].vlines(pp_inv, ymin=0, ymax=equilibrium_max_cluster.mean(axis=0))
-    axes[1].set_ylabel("Giant component")
-    axes[1].set_yscale("log")
-
-    return
+    plt.show()"""
 
 
 if __name__ == "__main__":
