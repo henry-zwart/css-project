@@ -333,7 +333,7 @@ def logistic_phase_plot(
 
         for repeat in trange(n_repeats):
             # Run model till equilibrium
-            model = Logistic(
+            model = model_type(
                 width,
                 control=init_nutrient,
                 alive_prop=init_density,
@@ -374,7 +374,7 @@ def logistic_phase_plot(
             model.grid = initial_grid
             for bw_steps, ns in enumerate(nutrient_vals[left_steps - 2 :: -1], start=2):
                 i = left_steps - bw_steps
-                model.supplement_rate = ns
+                model.set_control(ns)
                 model.run(iters_per_step)
                 equilibrium_density[repeat, i] = model.proportion_alive()
                 equilibrium_cluster_ratio[repeat, i] = ratio_cluster_size(model.grid)
