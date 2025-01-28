@@ -297,6 +297,24 @@ def eq_after_inv(width, p_nat):
     plt.show()
 
 
+def eq_after_inv_cluster_plots(pp_inv, density_after_avg, equilibrium_max_cluster):
+    fig, axes = plt.subplots(
+        nrows=6, ncols=1, layout="constrained", figsize=(8, 10), sharex=True
+    )
+    # Plots the equilibrium density after introduction of invasive species
+    axes[0].plot(pp_inv, density_after_avg)
+    axes[0].set_ylabel("Equilibrium Density")
+    axes[0].set_ylim(0, max(density_after_avg) + 0.01)
+
+    # Plots the Giant component after introduction of invasive species
+    axes[1].plot(pp_inv, equilibrium_max_cluster.mean(axis=0))
+    axes[1].vlines(pp_inv, ymin=0, ymax=equilibrium_max_cluster.mean(axis=0))
+    axes[1].set_ylabel("Giant component")
+    axes[1].set_yscale("log")
+
+    return
+
+
 if __name__ == "__main__":
     timespan = 20
     width = 128
