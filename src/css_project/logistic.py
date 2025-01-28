@@ -16,7 +16,7 @@ class Logistic(VegetationModel):
         self,
         width: int = 128,
         consume_rate: float = 63.7,
-        supplement_rate: float = 35.0,
+        control: float = 35.0,
         random_seed: int | None = 42,
         alive_prop: float = 0.01,
         init_method: str = "random",
@@ -25,7 +25,7 @@ class Logistic(VegetationModel):
         self.rng = default_rng(random_seed)
         self.transition_prob = np.zeros_like(self.grid, dtype=np.float64)
         self.consume_rate = consume_rate
-        self.supplement_rate = supplement_rate
+        self.supplement_rate = control
         self.proportion_alive_list = []
 
     @property
@@ -81,7 +81,7 @@ class LogisticTwoNative(VegetationModel):
         width: int = 128,
         consume_rate_1: float = 63.7,
         consume_rate_2: float = 63.7,
-        supplement_rate: float = 35.0,
+        control: float = 35.0,
         species_prop: list[float] | tuple[float, float] | np.ndarray = (0.25, 0.25),
         init_method: str = "random",
         random_seed: int | None = 42,
@@ -91,7 +91,7 @@ class LogisticTwoNative(VegetationModel):
         self.transition_prob = np.zeros((*self.grid.shape, 3), dtype=np.float64)
         self.consume_rate_1 = consume_rate_1
         self.consume_rate_2 = consume_rate_2
-        self.supplement_rate = supplement_rate
+        self.supplement_rate = control
         self.proportion_native_alive_list = []
         self.proportion_invasive_alive_list = []
 

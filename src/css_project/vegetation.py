@@ -36,7 +36,7 @@ class Vegetation(VegetationModel):
         width: int = 128,
         small_radius: int = 1,
         large_radius: int = 4,
-        positive_factor: int = 7,
+        control: int = 7,
         negative_factor: int = 1,
         init_method="random",
         alive_prop: float = 0.5,
@@ -55,7 +55,7 @@ class Vegetation(VegetationModel):
             alive_prop: Initial proportion of occupied cells.
         """
         super().__init__(width, alive_prop, init_method)
-        self.positive_factor = positive_factor
+        self.positive_factor = control
         self.negative_factor = negative_factor
         self.close_kernel = neighbour_count_kernel(small_radius)
         self.far_kernel = neighbour_count_kernel(large_radius)
@@ -107,9 +107,8 @@ class InvasiveVegetation(VegetationModel):
         width: int = 128,
         small_radius: int = 1,
         large_radius: int = 4,
-        pos_factor_nat: int = 8,
+        control: int = 8,
         neg_factor_nat: int = 1,
-        pos_factor_inv: int = 8,
         neg_factor_inv: int = 1,
         init_method="random",
         species_prop: list[float] | tuple[float, float] | np.ndarray = (0.25, 0.25),
@@ -117,9 +116,8 @@ class InvasiveVegetation(VegetationModel):
         super().__init__(width, list(species_prop), init_method)
         self.small_radius = small_radius
         self.large_radius = large_radius
-        self.pos_factor_nat = pos_factor_nat
+        self.pos_factor = control
         self.neg_factor_nat = neg_factor_nat
-        self.pos_factor_inv = pos_factor_inv
         self.neg_factor_inv = neg_factor_inv
         self.close_kernel = neighbour_count_kernel(small_radius)
         self.far_kernel = neighbour_count_kernel(large_radius)
@@ -172,14 +170,14 @@ class InvasiveVegetation(VegetationModel):
         far_neighbours_inv = count_neighbours(self.grid == 2, self.far_kernel)
 
         feedback_nat = self.compute_feedback(
-            self.pos_factor_nat,
+            self.pos_factor,
             close_neighbours_nat,
             far_neighbours_nat,
             far_neighbours_inv,
         )
 
         feedback_inv = self.compute_feedback(
-            self.pos_factor_inv,
+            self.pos_factor,
             close_neighbours_inv,
             far_neighbours_nat,
             far_neighbours_inv,

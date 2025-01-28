@@ -10,7 +10,7 @@ if __name__ == "__main__":
         width,
         consume_rate_1=63.7,
         consume_rate_2=63.7 * (0.5),
-        supplement_rate=35,
+        control=35,
         species_prop=[0.001, 0.0],
     )
     for _ in trange(500):

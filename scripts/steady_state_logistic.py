@@ -8,7 +8,7 @@ width = 256
 model = Logistic(
     width,
     consume_rate=63.7,
-    supplement_rate=35,
+    control=35,
     alive_prop=0.01,
 )
 t = 0
