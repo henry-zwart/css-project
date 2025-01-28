@@ -1,0 +1,13 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+from css_project.logistic import Logistic
+from css_project.visualisation import densities_invasive_logistic
+
+width = 128
+random_seed = 1
+
+fig1 = densities_invasive_logistic(width, random_seed)
+
+fig1.savefig("species_densities_logistic", dpi=300)
+
