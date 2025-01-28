@@ -116,6 +116,7 @@ class InvasiveVegetation(VegetationModel):
         neg_factor_inv: int = 1,
         init_method="random",
         species_prop: list[float] | tuple[float, float] | np.ndarray = (0.25, 0.25),
+        random_seed = None
     ):
         super().__init__(width, list(species_prop), init_method)
         self.small_radius = small_radius
@@ -131,18 +132,9 @@ class InvasiveVegetation(VegetationModel):
     @property
     def n_states(self) -> int:
         return 3
-
-    def introduce_invasive(self, p_inv=0.1, type="empty"):
-        if type == "random":
-            random_matrix = np.random.random(self.grid.shape)
-            self.grid[np.where(random_matrix <= p_inv)] = 2
-        elif type == "empty":
-            empty_grid = self.grid == 0
-            random_cells = (empty_grid).sum()
-            random_nrs = np.random.random(random_cells)
-            self.grid[empty_grid] = np.where(random_nrs < p_inv, 2, 0)
-        else:
-            raise ValueError("No valid type for invasive introduction")
+    
+    def set_control(self, value):
+        self.pos_factor = value
 
     def compute_feedback(
         self,

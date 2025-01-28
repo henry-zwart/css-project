@@ -101,12 +101,9 @@ class LogisticTwoNative(VegetationModel):
     @property
     def n_states(self) -> int:
         return 3
-
-    def add_species_to_empty(self, p: float, species: int = 2):
-        candidate = self.rng.random(self.grid.shape) <= p
-        empty_cell = self.grid == 0
-        new_occupied_cells = candidate & empty_cell
-        self.grid[new_occupied_cells] = species
+    
+    def set_control(self, value):
+        self.positive_factor = value
 
     def calculate_competition(
         self, count_species_1: np.ndarray, count_species_2: np.ndarray
