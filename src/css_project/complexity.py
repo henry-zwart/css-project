@@ -124,3 +124,86 @@ def maximum_cluster_size(arr: np.ndarray) -> float:
         raise ValueError(f"Expected 2D array, received array of shape: {arr.shape}")
     cluster_sizes = _get_cluster_sizes(arr)
     return cluster_sizes.max() / (arr.shape[0] * arr.shape[1])
+
+
+def avg_cluster_size(arr: np.ndarray) -> float:
+    """Average cluster size in a cellular automata grid.
+
+    Assumes a Moore's neighbourhood, so diagonal neighbours are included.
+
+    Args:
+        arr: A 2D numpy array of integers representing the states of the grid
+            cells.
+
+    Returns:
+        The average cluster size.
+
+    Raises:
+        ValueError: If supplied array is not 2D.
+    """
+    if arr.ndim != 2:
+        raise ValueError(f"Expected 2D array, received array of shape: {arr.shape}")
+    cluster_sizes = _get_cluster_sizes(arr)[1:]
+    if len(cluster_sizes) == 0:
+        return 0
+    return cluster_sizes.mean()
+
+
+def variance_cluster_size(arr: np.ndarray) -> float:
+    """Cluster size variance in a cellular automata grid.
+
+    Assumes a Moore's neighbourhood, so diagonal neighbours are included.
+    Variance calculated as the sample variance (normalised by N-1).
+
+    Args:
+        arr: A 2D numpy array of integers representing the states of the grid
+            cells.
+
+    Returns:
+        The sample variance of identified cluster sizes.
+
+    Raises:
+        ValueError: If supplied array is not 2D.
+    """
+    if arr.ndim != 2:
+        raise ValueError(f"Expected 2D array, received array of shape: {arr.shape}")
+    cluster_sizes = _get_cluster_sizes(arr)[1:]
+    n_clusters = len(cluster_sizes)
+    if n_clusters < 2:
+        return np.nan
+    return cluster_sizes.var(ddof=1)
+
+
+def fluctuation_cluster_size(arr: np.ndarray) -> float:
+    """Cluster size fluctuation in a cellular automata grid.
+
+    Calculated as in https://www.sciencedirect.com/science/article/pii/S0378437119311860.
+
+    The fluctuation is measured as the cluster size variance, normalised
+    by the squared grid area, multiplied by the number of identified clusters.
+
+    It provides a dimensionless measure of the 'total fluctuation for
+    patch sizes in a given grid'.
+
+    Assumes a Moore's neighbourhood, so diagonal neighbours are included.
+    Variance calculated as the sample variance (normalised by N-1).
+
+    Args:
+        arr: A 2D numpy array of integers representing the states of the grid
+            cells.
+
+    Returns:
+        The cluster size fluctuation.
+
+    Raises:
+        ValueError: If supplied array is not 2D.
+    """
+    if arr.ndim != 2:
+        raise ValueError(f"Expected 2D array, received array of shape: {arr.shape}")
+    cluster_sizes = _get_cluster_sizes(arr)[1:]
+    n_clusters = len(cluster_sizes)
+    if n_clusters < 2:
+        return np.nan
+    variance = cluster_sizes.var(ddof=1)
+    area = arr.shape[0] * arr.shape[1]
+    return n_clusters * variance / (area**2)
