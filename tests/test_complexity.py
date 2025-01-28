@@ -134,3 +134,26 @@ def test_cluster_size_ratio_multi_cluster():
     expected_val = 4
     actual_val = ratio_cluster_size(grid)
     assert np.isclose(expected_val, actual_val)
+
+
+# add test (start with test), create grid that has a cluster with ones,
+# and a cluster with twos, (right next to each other
+# check if it sees one or two clusters)
+
+
+def test_cluster_count_mixed_states():
+    grid = np.zeros((4, 4), dtype=np.int64)
+    grid[0:2, :2] = 1
+    grid[2:4, :2] = 2
+    expected_val = 2
+    actual_val = count_clusters(grid)
+    assert np.isclose(expected_val, actual_val)
+
+
+def test_cluster_size_mixed_states():
+    grid = np.zeros((4, 4), dtype=np.int64)
+    grid[0:2, :2] = 1
+    grid[2:4, :2] = 2
+    expected_val = 0.25
+    actual_val = maximum_cluster_size(grid)
+    assert np.isclose(expected_val, actual_val)

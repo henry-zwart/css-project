@@ -50,6 +50,8 @@ def _get_cluster_sizes(arr: np.ndarray) -> np.ndarray:
     Two neighbouring cells are considered part of a cluster if their values are
     non-zero.
 
+    We only count '1', assumed to be the native species.
+
     Args:
         arr: A 2D numpy array of integers representing the states of the grid
             cells.
@@ -57,8 +59,10 @@ def _get_cluster_sizes(arr: np.ndarray) -> np.ndarray:
     Returns:
         Numpy array containing the sizes of identified clusters.
     """
-    cluster_matrix, _ = ndimage.label(arr, structure=CLUSTER_COUNT_STRUCTURE)
-    return ndimage.sum(arr, cluster_matrix, index=np.arange(cluster_matrix.max() + 1))
+    cluster_matrix, _ = ndimage.label(arr == 1, structure=CLUSTER_COUNT_STRUCTURE)
+    return ndimage.sum(
+        arr == 1, cluster_matrix, index=np.arange(cluster_matrix.max() + 1)
+    )
 
 
 def count_clusters(arr: np.ndarray) -> int:
