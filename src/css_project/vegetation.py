@@ -121,6 +121,8 @@ class InvasiveVegetation(VegetationModel):
         self.neg_factor_inv = neg_factor_inv
         self.close_kernel = neighbour_count_kernel(small_radius)
         self.far_kernel = neighbour_count_kernel(large_radius)
+        self.proportion_native_alive_list = []
+        self.proportion_invasive_alive_list = []
 
     @property
     def n_states(self) -> int:
@@ -213,6 +215,9 @@ class InvasiveVegetation(VegetationModel):
 
         # Updates for invasive cells
         self.grid[invasive_cell & feedback_inv_st_0] = 0
+
+        self.proportion_native_alive_list.append(self.species_alive()[0] / self.area)
+        self.proportion_invasive_alive_list.append(self.species_alive()[1] / self.area)
 
 
 def count_neighbours(states: np.ndarray, kern: np.ndarray) -> np.ndarray:

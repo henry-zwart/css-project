@@ -7,7 +7,7 @@ from matplotlib.pyplot import cm
 
 from css_project.fine_grained import FineGrained
 
-from .vegetation import Vegetation
+from .vegetation import Vegetation, InvasiveVegetation
 from .logistic import Logistic, LogisticTwoNative
 from .simple_ca import GameOfLife
 
@@ -176,7 +176,7 @@ def phase_transition_prob(width, p_list, pos_weight_list: int | list[int]):
 
     return fig1, fig2
 
-def densities_invasive_logistic(width, random_seed):
+def densities_invasive_logistic(width, random_seed, p):
   
     # Run model until steady state
     model = Logistic(width, random_seed=random_seed)
@@ -187,7 +187,7 @@ def densities_invasive_logistic(width, random_seed):
     # Introduce invasive species
     invasive_model = LogisticTwoNative(width)
     invasive_model.grid = equilibrium_state
-    invasive_model.add_species_to_empty(p=0.9)
+    invasive_model.add_species_to_empty(p=p)
 
     invasive_model.find_steady_state(1000)
 
@@ -205,9 +205,47 @@ def densities_invasive_logistic(width, random_seed):
     plt.plot(iterations, invasive, label='Invasive Species')
     plt.plot(iterations, dead, label='Empty Cells')
     plt.axhline(y = dead[-1], color='r', linestyle='--', linewidth='0.8')
-    plt.title("Proportion of Species")
+    plt.title("Proportion of Species over Time")
     plt.xlabel("Time Step")
-    plt.ylabel("Proportion of Species over Time")
+    plt.ylabel("Proportion of Species")
     plt.legend()
+
+    return fig1
+
+def densities_invasive_coursegrained(width, p_inv):
+  
+    # Run model until steady state
+    model = Vegetation(width)
+    model.find_steady_state(100)
+
+    equilibrium_state = model.grid
+
+    # Introduce invasive species
+    invasive_model = InvasiveVegetation(width)
+    invasive_model.grid = equilibrium_state
+    
+    invasive_model.introduce_invasive(p_inv=p_inv)
+
+    invasive_model.find_steady_state(100)
+
+    # Calculate proportions of native, invasive and empty cells
+    native = model.proportion_alive_list + invasive_model.proportion_native_alive_list
+    invasive = [0] * len(model.proportion_alive_list) + invasive_model.proportion_invasive_alive_list
+    iterations = list(range(len(model.proportion_alive_list)+len(invasive_model.proportion_native_alive_list)))
+
+    dead = [1-x for x in [a + b for a, b in zip(native, invasive)]]
+
+    # Plot
+    fig1 = plt.figure(figsize=(8, 6))
+
+    plt.plot(iterations, native, label='Native Species')
+    plt.plot(iterations, invasive, label='Invasive Species')
+    plt.plot(iterations, dead, label='Empty Cells')
+    plt.axhline(y = dead[-1], color='r', linestyle='--', linewidth='0.8')
+    plt.title("Proportion of Species over Time")
+    plt.xlabel("Time Step")
+    plt.ylabel("Proportion of Species")
+    plt.legend()
+
 
     return fig1
