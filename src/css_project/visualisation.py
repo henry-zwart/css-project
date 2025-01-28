@@ -3,13 +3,23 @@ import matplotlib.colors as mpc
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.axes import Axes
+from matplotlib.figure import Figure
 from matplotlib.pyplot import cm
+from tqdm import trange
 
+from css_project.complexity import (
+    count_clusters,
+    fluctuation_cluster_size,
+    maximum_cluster_size,
+    ratio_cluster_size,
+    variance_cluster_size,
+)
 from css_project.fine_grained import FineGrained
+from css_project.logistic import Logistic
 
-from .vegetation import Vegetation, InvasiveVegetation
-from .logistic import Logistic, LogisticTwoNative
+from .logistic import LogisticTwoNative
 from .simple_ca import GameOfLife
+from .vegetation import InvasiveVegetation, Vegetation
 
 QUALITATIVE_COLOURS = [
     "#CCBB44",
@@ -113,9 +123,10 @@ def animate_nutrients(ca: FineGrained, steps: int, fps: int = 5):
 
     return ani
 
+
 def phase_transition_pos_weight(width, pos_weight_list):
-    """Creates a plot which calculates the density at equilibrium 
-        for a list of positive weights (control). 
+    """Creates a plot which calculates the density at equilibrium
+    for a list of positive weights (control).
     """
     alive_list = []
 
@@ -134,16 +145,17 @@ def phase_transition_pos_weight(width, pos_weight_list):
     plt.ylabel("Proportion of Alive Cells at Steady State")
 
     return fig
-    
+
+
 def phase_transition_prob(width, p_list, pos_weight_list: int | list[int]):
     """Creates a plot which calculates the density at equilibrium given
-        an initial probability to observe a phase transition. 
+    an initial probability to observe a phase transition.
 
-        This function can make the graph for a list of positive weights 
-        to observe the phase transitions for different positive weights.
+    This function can make the graph for a list of positive weights
+    to observe the phase transitions for different positive weights.
 
-        Furthermore a plot is created which shows the density of alive cells
-        over time given the initial probability. 
+    Furthermore a plot is created which shows the density of alive cells
+    over time given the initial probability.
     """
     # Plot of starting probability vs number of alive cells at equilibrium
     fig2 = plt.figure(figsize=(8, 6))
@@ -155,9 +167,9 @@ def phase_transition_prob(width, p_list, pos_weight_list: int | list[int]):
     if isinstance(pos_weight_list, int):
         pos_weight_list = [pos_weight_list]
 
-    for pos_weight in pos_weight_list: 
+    for pos_weight in pos_weight_list:
         iterations_list = []
-        alive_list = []   
+        alive_list = []
         for p in p_list:
             vegetation = Vegetation(width, positive_factor=pos_weight, alive_prop=p)
             vegetation.find_steady_state(1000)
@@ -167,10 +179,11 @@ def phase_transition_prob(width, p_list, pos_weight_list: int | list[int]):
 
         steady_alive_list = [x[-1] for x in alive_list]
 
-        plt.scatter(p_list, steady_alive_list, label="Pos. Weight=%d" % (pos_weight))
+        plt.scatter(p_list, steady_alive_list, label=f"Pos. Weight={pos_weight}")
     plt.legend()
 
-    # Plot of proportion alive cells vs number of iterations for multiple starting probabilities
+    # Plot of proportion alive cells vs number of iterations for
+    #   multiple starting probabilities
     fig1 = plt.figure(figsize=(8, 6))
 
     num_of_lines = len(p_list)
@@ -188,10 +201,11 @@ def phase_transition_prob(width, p_list, pos_weight_list: int | list[int]):
 
     return fig1, fig2
 
+
 def densities_invasive_logistic(width, random_seed, p):
-    """ Creates a plot for the density of both native and invasive species 
+    """Creates a plot for the density of both native and invasive species
     over time in the logistic model. The invasive species is added
-    after a steady state is reached. """
+    after a steady state is reached."""
     # Run model until steady state
     model = Logistic(width, random_seed=random_seed)
     model.find_steady_state(1000)
@@ -207,18 +221,25 @@ def densities_invasive_logistic(width, random_seed, p):
 
     # Calculate proportions of native, invasive and empty cells
     native = model.proportion_alive_list + invasive_model.proportion_native_alive_list
-    invasive = [0] * len(model.proportion_alive_list) + invasive_model.proportion_invasive_alive_list
-    iterations = list(range(len(model.proportion_alive_list)+len(invasive_model.proportion_native_alive_list)))
+    invasive = [0] * len(
+        model.proportion_alive_list
+    ) + invasive_model.proportion_invasive_alive_list
+    iterations = list(
+        range(
+            len(model.proportion_alive_list)
+            + len(invasive_model.proportion_native_alive_list)
+        )
+    )
 
-    dead = [1-x for x in [a + b for a, b in zip(native, invasive)]]
+    dead = [1 - x for x in [a + b for a, b in zip(native, invasive, strict=False)]]
 
     # Plot
     fig1 = plt.figure(figsize=(8, 6))
 
-    plt.plot(iterations, native, label='Native Species')
-    plt.plot(iterations, invasive, label='Invasive Species')
-    plt.plot(iterations, dead, label='Empty Cells')
-    plt.axhline(y = dead[-1], color='r', linestyle='--', linewidth='0.8')
+    plt.plot(iterations, native, label="Native Species")
+    plt.plot(iterations, invasive, label="Invasive Species")
+    plt.plot(iterations, dead, label="Empty Cells")
+    plt.axhline(y=dead[-1], color="r", linestyle="--", linewidth="0.8")
     plt.title("Proportion of Species over Time")
     plt.xlabel("Time Step")
     plt.ylabel("Proportion of Species")
@@ -226,15 +247,15 @@ def densities_invasive_logistic(width, random_seed, p):
 
     return fig1
 
+
 def densities_invasive_coarsegrained(width, p_nat, p_inv):
-    """ Creates a plot for the density of both native and invasive species 
+    """Creates a plot for the density of both native and invasive species
     over time in the coarse-grained model. The invasive species is added
-    after a steady state is reached. """
+    after a steady state is reached."""
     # Run model until steady state
     model = InvasiveVegetation(width, species_prop=(p_nat, 0))
     model.run(100)
-   
-    
+
     model.introduce_invasive(p_inv=p_inv)
 
     model.run(100)
@@ -244,18 +265,176 @@ def densities_invasive_coarsegrained(width, p_nat, p_inv):
     invasive = model.proportion_invasive_alive_list
     iterations = list(range(len(model.proportion_native_alive_list)))
 
-    dead = [1-x for x in [a + b for a, b in zip(native, invasive)]]
+    dead = [1 - x for x in [a + b for a, b in zip(native, invasive, strict=False)]]
 
     # Plot
     fig1 = plt.figure(figsize=(8, 6))
 
-    plt.plot(iterations, native, label='Native Species')
-    plt.plot(iterations, invasive, label='Invasive Species')
-    plt.plot(iterations, dead, label='Empty Cells')
-    plt.axhline(y = dead[-1], color='r', linestyle='--', linewidth='0.8')
+    plt.plot(iterations, native, label="Native Species")
+    plt.plot(iterations, invasive, label="Invasive Species")
+    plt.plot(iterations, dead, label="Empty Cells")
+    plt.axhline(y=dead[-1], color="r", linestyle="--", linewidth="0.8")
     plt.title("Proportion of Species over Time")
     plt.xlabel("Time Step")
     plt.ylabel("Proportion of Species")
     plt.legend()
 
     return fig1
+
+
+def distribution_leftright_steps(
+    n_steps: int,
+    min_val: float,
+    init_val: float,
+    max_val: float,
+) -> tuple[int, int]:
+    right_range = max_val - init_val
+    total_range = max_val - min_val
+    right_proportion = right_range / total_range
+    right_steps = int(right_proportion * n_steps)
+    left_steps = n_steps - right_steps
+    return (left_steps, right_steps)
+
+
+def logistic_phase_plot(
+    width: int,
+    init_density: float,
+    init_nutrient: float,
+    min_nutrient: float,
+    max_nutrient: float,
+    n_steps: int,
+    iters_per_step: int,
+    n_repeats: int = 1,
+) -> tuple[Figure, Axes]:
+    fig, axes = plt.subplots(
+        nrows=6, ncols=1, layout="constrained", figsize=(8, 10), sharex=True
+    )
+
+    # Distribute n_steps between left and right
+    left_steps, right_steps = distribution_leftright_steps(
+        n_steps,
+        min_nutrient,
+        init_nutrient,
+        max_nutrient,
+    )
+
+    left_nutrients = np.linspace(min_nutrient, init_nutrient, left_steps)
+    right_nutrients = np.linspace(init_nutrient, max_nutrient, right_steps)
+    nutrient_vals = np.concat((left_nutrients[:-1], right_nutrients))
+
+    equilibrium_density = np.zeros((n_repeats, n_steps - 1), dtype=np.float64)
+    equilibrium_cluster_ratio = np.zeros_like(equilibrium_density)
+    equilibrium_n_clusters = np.zeros_like(equilibrium_density)
+    equilibrium_max_cluster = np.zeros_like(equilibrium_density)
+    equilibrium_variance = np.zeros_like(equilibrium_density)
+    equilibrium_fluctuation = np.zeros_like(equilibrium_density)
+
+    for repeat in trange(n_repeats):
+        # Run model till equilibrium
+        model = Logistic(
+            width,
+            supplement_rate=init_nutrient,
+            alive_prop=init_density,
+            random_seed=None,
+        )
+        model.run(1000)
+        initial_grid = model.grid.copy()
+
+        equilibrium_density[repeat, left_steps - 1] = model.proportion_alive()
+        equilibrium_cluster_ratio[repeat, left_steps - 1] = ratio_cluster_size(
+            model.grid
+        )
+        equilibrium_n_clusters[repeat, left_steps - 1] = count_clusters(model.grid)
+        equilibrium_max_cluster[repeat, left_steps - 1] = maximum_cluster_size(
+            model.grid
+        )
+        equilibrium_variance[repeat, left_steps - 1] = variance_cluster_size(model.grid)
+        equilibrium_fluctuation[repeat, left_steps - 1] = fluctuation_cluster_size(
+            model.grid
+        )
+
+        # Vary control parameter upward
+        for i, ns in enumerate(nutrient_vals[left_steps:], start=left_steps):
+            model.supplement_rate = ns
+            model.run(iters_per_step)
+            equilibrium_density[repeat, i] = model.proportion_alive()
+            equilibrium_cluster_ratio[repeat, i] = ratio_cluster_size(model.grid)
+            equilibrium_n_clusters[repeat, i] = count_clusters(model.grid)
+            equilibrium_max_cluster[repeat, i] = maximum_cluster_size(model.grid)
+            equilibrium_variance[repeat, i] = variance_cluster_size(model.grid)
+            equilibrium_fluctuation[repeat, i] = fluctuation_cluster_size(model.grid)
+
+        # Reset grid and vary control parameter downward
+        model.grid = initial_grid
+        for bw_steps, ns in enumerate(nutrient_vals[left_steps - 2 :: -1], start=2):
+            i = left_steps - bw_steps
+            model.supplement_rate = ns
+            model.run(iters_per_step)
+            equilibrium_density[repeat, i] = model.proportion_alive()
+            equilibrium_cluster_ratio[repeat, i] = ratio_cluster_size(model.grid)
+            equilibrium_n_clusters[repeat, i] = count_clusters(model.grid)
+            equilibrium_max_cluster[repeat, i] = maximum_cluster_size(model.grid)
+            equilibrium_variance[repeat, i] = variance_cluster_size(model.grid)
+            equilibrium_fluctuation[repeat, i] = fluctuation_cluster_size(model.grid)
+
+    # print(equilibrium_cluster_ratio.mean)
+    axes[0].plot(nutrient_vals, equilibrium_density.min(axis=0))
+    axes[0].plot(nutrient_vals, equilibrium_density.max(axis=0))
+    # axes[0].scatter(nutrient_vals, equilibrium_density, s=10)
+    #    axes[0].vlines(
+    # init_nutrient, ymin=0, ymax=equilibrium_density.mean(axis=0)[left_steps - 1]
+    # )
+    axes[0].set_ylabel("Equilibrium density")
+    axes[0].set_ylim(0, 1)
+
+    axes[1].plot(nutrient_vals, equilibrium_n_clusters.mean(axis=0))
+    # axes[1].scatter(nutrient_vals, equilibrium_n_clusters, s=10)
+    axes[1].vlines(
+        init_nutrient, ymin=0, ymax=equilibrium_n_clusters.mean(axis=0)[left_steps - 1]
+    )
+    axes[1].set_ylabel("Cluster count")
+    axes[1].set_ylim(0, None)
+
+    axes[2].plot(nutrient_vals, equilibrium_cluster_ratio.mean(axis=0))
+    # axes[2].scatter(nutrient_vals, equilibrium_cluster_ratio, s=10)
+    axes[2].vlines(
+        init_nutrient,
+        ymin=0,
+        ymax=equilibrium_cluster_ratio.mean(axis=0)[left_steps - 1],
+    )
+    axes[2].set_ylabel("Cluster size ratio")
+    axes[2].set_ylim(0, None)
+
+    axes[3].plot(nutrient_vals, equilibrium_max_cluster.mean(axis=0))
+    axes[3].vlines(
+        init_nutrient, ymin=0, ymax=equilibrium_max_cluster.mean(axis=0)[left_steps - 1]
+    )
+    axes[3].set_ylabel("Giant component")
+    axes[3].set_yscale("log")
+    # axes[3].set_ylim(0, 1)
+
+    axes[4].plot(nutrient_vals, equilibrium_variance.mean(axis=0))
+    # axes[2].scatter(nutrient_vals, equilibrium_cluster_ratio, s=10)
+    axes[4].vlines(
+        init_nutrient,
+        ymin=0,
+        ymax=equilibrium_variance.mean(axis=0)[left_steps - 1],
+    )
+    axes[4].set_ylabel("Cluster size variance")
+    axes[4].set_yscale("log")
+    # axes[4].set_ylim(0, None)
+
+    axes[5].plot(nutrient_vals, equilibrium_fluctuation.mean(axis=0))
+    # axes[2].scatter(nutrient_vals, equilibrium_cluster_ratio, s=10)
+    axes[5].vlines(
+        init_nutrient,
+        ymin=0,
+        ymax=equilibrium_fluctuation.mean(axis=0)[left_steps - 1],
+    )
+    axes[5].set_ylabel("Cluster size fluctuation")
+    axes[5].set_yscale("log")
+    # axes[5].set_ylim(0, None)
+
+    fig.supxlabel("Nutrient supplementation")
+
+    return fig, axes

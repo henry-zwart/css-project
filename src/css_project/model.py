@@ -114,6 +114,14 @@ class VegetationModel(ABC):
         x = [(self.grid == i).sum() for i in range(1, self.n_states)]
         return x
 
+    def proportion_alive(self) -> float:
+        """Count the proportion of living cells in the grid.
+
+        Returns:
+            The proportion of cells with non-zero state.
+        """
+        return self.total_alive() / self.area
+
     def is_steady_state(self, threshold: float = 0.001) -> bool:
         """Determine whether the grid is in a steady state compared to its history.
 
