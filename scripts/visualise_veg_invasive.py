@@ -315,9 +315,9 @@ def eq_after_inv(width, p_nat):
     equilibrium_cluster_count_list = []
 
     count = 0
-    pp_inv = np.linspace(0, 1, 5)
+    pp_inv = np.linspace(0, 1, 100)
 
-    for _ in range(0, 2):
+    for _ in range(0, 5):
         vegetation = InvasiveVegetation(width, species_prop=(p_nat, 0))
         vegetation.run()
         initial_grid = vegetation.grid.copy()
