@@ -259,10 +259,10 @@ def run_new_model(width, species_prop):
 
 
 def eq_after_inv(width, p_nat):
-    count = 0
+    density_after = []
     density_after_list = []
-    density_after_listt = []
 
+    count = 0
     pp_inv = np.linspace(0, 1, 100)
 
     for _ in range(0, 5):
@@ -270,6 +270,7 @@ def eq_after_inv(width, p_nat):
         vegetation.run()
         initial_grid = vegetation.grid.copy()
         total_cells = vegetation.area
+
         for p_inv in pp_inv:
             # Introduce invasive
             count += 1
@@ -277,14 +278,14 @@ def eq_after_inv(width, p_nat):
 
             vegetation.introduce_invasive(p_inv)
             vegetation.run(iterations=500)
-            density_after_list.append(vegetation.species_alive()[0] / total_cells)
+            density_after.append(vegetation.species_alive()[0] / total_cells)
             vegetation.grid = initial_grid.copy()
 
-        density_after_listt.append(density_after_list)
-        density_after_list = []
+        density_after_list.append(density_after)
+        density_after = []
 
-    density_after_listt = np.asarray(density_after_listt)
-    density_after_avg = density_after_listt.mean(axis=0)
+    density_after_list = np.asarray(density_after_list)
+    density_after_avg = density_after_list.mean(axis=0)
 
     plt.figure(figsize=(10, 8))
     plt.plot(pp_inv, density_after_avg, linestyle="-", label="Density Native species")
