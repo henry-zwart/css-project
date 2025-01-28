@@ -101,7 +101,7 @@ class LogisticTwoNative(VegetationModel):
     @property
     def n_states(self) -> int:
         return 3
-    
+
     def set_control(self, value):
         self.supplement_rate = value
 
