@@ -259,25 +259,6 @@ def run_new_model(width, species_prop):
 
 
 def eq_after_inv(width, p_nat):
-    """Let the native species reach equilibrium without any invasive
-    Introduce invasive species at some density
-    Let the system reach a new equilibrium
-    Measure the new density of the native species
-    Do this for a particular initial native density and control parameter.
-    Repeat for different parameters which give qualitatively different native
-    equilibrium states (i.e. different patterns/densities).
-
-    Plot:
-    Plot type: Line
-    x-axis: Density of introduced invasive
-    y-axis: Density of native at new equilibrium
-    Different lines: Different parameters for the native population
-    """
-    vegetation = InvasiveVegetation(width, species_prop=(p_nat, 0))
-    vegetation.run()
-    initial_grid = vegetation.grid.copy()
-    total_cells = vegetation.area
-
     count = 0
     density_after_list = []
     density_after_listt = []
@@ -285,6 +266,10 @@ def eq_after_inv(width, p_nat):
     pp_inv = np.linspace(0, 1, 100)
 
     for _ in range(0, 5):
+        vegetation = InvasiveVegetation(width, species_prop=(p_nat, 0))
+        vegetation.run()
+        initial_grid = vegetation.grid.copy()
+        total_cells = vegetation.area
         for p_inv in pp_inv:
             # Introduce invasive
             count += 1
