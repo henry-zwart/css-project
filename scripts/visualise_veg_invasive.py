@@ -243,17 +243,12 @@ def run_model_multiple(
     return
 
 
-def run_new_model(width, species_prop):
+def run_new_model(width, p_nat, p_inv):
     vegetation = InvasiveVegetation(width, species_prop=(p_nat, 0))
     vegetation.run()
 
-    initial_grid = vegetation.grid.copy()
-
-    # Reset grid to initial state
-    vegetation.grid = initial_grid.copy()
-
-    # Make animation of grid
-    ani = animate_ca(vegetation, timespan)
+    vegetation.introduce_invasive(p_inv)
+    ani = animate_ca(vegetation, 200, fps=25)
     ani.save("vegetation_new.gif")
 
 
@@ -291,7 +286,7 @@ def eq_after_inv_cluster_plots(
     axes[3].set_ylabel("Cluster size fluctuation")
     axes[3].set_yscale("log")
 
-    fig.supxlabel("Native Species Pressence at Equilibrium")
+    fig.supxlabel("Introduced Proportion ofInvasive Species on Dead Cells ")
 
     plt.show()
 
@@ -367,13 +362,14 @@ def eq_after_inv(width, p_nat):
 
 if __name__ == "__main__":
     timespan = 20
-    width = 30
+    width = 128
     p_nat = 0.25
+    p_inv = 0.85
 
-    p_inv = 0.1
+    run_new_model(width, p_nat, p_inv)
 
-    vegetation = InvasiveVegetation(width, species_prop=(p_nat, 0))
-    vegetation.run(iterations=2)
+    # vegetation = InvasiveVegetation(width, species_prop=(p_nat, 0))
+    # vegetation.run(iterations=2)
     # vegetation.introduce_invasive(p_inv)
     # vegetation.run(iterations=1)
 
