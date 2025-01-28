@@ -173,12 +173,20 @@ class InvasiveVegetation(VegetationModel):
         return np.clip(np.fix(raw_feedback), -1, 1).astype(int)
 
     def update(self):
-        close_neighbours_nat = count_neighbours(self.grid == 1, self.close_kernel)
-        close_neighbours_inv = count_neighbours(self.grid == 2, self.close_kernel)
+        close_neighbours_nat = count_neighbours(
+            self.grid == 1, self.close_kernel
+        )  # correct
+        close_neighbours_inv = count_neighbours(
+            self.grid == 2, self.close_kernel
+        )  # correct
 
         # since some states are 2, will it be disproportionally doubled now?
-        far_neighbours_nat = count_neighbours(self.grid == 1, self.far_kernel)
-        far_neighbours_inv = count_neighbours(self.grid == 2, self.far_kernel)
+        far_neighbours_nat = count_neighbours(
+            self.grid == 1, self.far_kernel
+        )  # correct
+        far_neighbours_inv = count_neighbours(
+            self.grid == 2, self.far_kernel
+        )  # correct
 
         feedback_nat = self.compute_feedback(
             self.pos_factor,
