@@ -276,21 +276,44 @@ def eq_after_inv(width, p_nat):
     vegetation = InvasiveVegetation(width, species_prop=(p_nat, 0))
     vegetation.run()
     initial_grid = vegetation.grid.copy()
+    total_cells = vegetation.area
 
-    # count = 0
-    for p_inv in np.linspace(0, 1, 100):
-        # introduce invasive
-        # print("Count: ", count)
-        # count += 1
+    count = 0
+    density_after_list = []
+    density_after_listt = []
 
-        vegetation.introduce_invasive(p_inv)
-        vegetation.run(iterations=100)
-        vegetation.grid = initial_grid.copy()
+    pp_inv = np.linspace(0, 1, 100)
+
+    for _ in range(0, 5):
+        for p_inv in pp_inv:
+            # Introduce invasive
+            count += 1
+            print("Count: ", count)
+
+            vegetation.introduce_invasive(p_inv)
+            vegetation.run(iterations=500)
+            density_after_list.append(vegetation.species_alive()[0] / total_cells)
+            vegetation.grid = initial_grid.copy()
+
+        density_after_listt.append(density_after_list)
+        density_after_list = []
+
+    density_after_listt = np.asarray(density_after_listt)
+    density_after_avg = density_after_listt.mean(axis=0)
+
+    plt.figure(figsize=(10, 8))
+    plt.plot(pp_inv, density_after_avg, linestyle="-", label="Density Native species")
+    plt.title("Density of Native species After Equilibrium")
+    plt.xlabel("Introduced Proportion of Invasive Species")
+    plt.ylabel("Proportion of Native Species")
+    plt.ylim(0, max(density_after_avg) + 0.05)
+    plt.savefig("proportion_nat_inv_eq.png", dpi=300)
+    plt.show()
 
 
 if __name__ == "__main__":
     timespan = 20
-    width = 64
+    width = 128
     p_nat = 0.25
 
     eq_after_inv(width, p_nat)

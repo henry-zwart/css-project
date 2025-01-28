@@ -5,7 +5,7 @@ from css_project.kernel import neighbour_count_kernel
 
 from .model import VegetationModel
 
-np.random.seed(2)
+# np.random.seed(2)
 
 
 class Vegetation(VegetationModel):
