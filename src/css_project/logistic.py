@@ -92,6 +92,8 @@ class LogisticTwoNative(VegetationModel):
         self.consume_rate_1 = consume_rate_1
         self.consume_rate_2 = consume_rate_2
         self.supplement_rate = supplement_rate
+        self.proportion_native_alive_list = []
+        self.proportion_invasive_alive_list = []
 
     @property
     def n_states(self) -> int:
@@ -170,6 +172,9 @@ class LogisticTwoNative(VegetationModel):
         self.grid = new_grid
 
         self.proportion_alive_list.append(self.total_alive() / self.area)
+
+        self.proportion_native_alive_list.append(self.species_alive()[0] / self.area)
+        self.proportion_invasive_alive_list.append(self.species_alive()[1] / self.area)
 
 
 def count_neighbours(states: np.ndarray) -> np.ndarray:
