@@ -36,11 +36,11 @@ class Vegetation(VegetationModel):
         width: int = 128,
         small_radius: int = 1,
         large_radius: int = 4,
-        control: int = 7,
+        control: float = 7,
         negative_factor: int = 1,
         init_method="random",
         alive_prop: float = 0.5,
-        random_seed = None
+        random_seed=None,
     ):
         """Initialise the Vegetation cellular automata model.
 
@@ -65,7 +65,7 @@ class Vegetation(VegetationModel):
     def n_states(self) -> int:
         """Number of states in the model."""
         return 2
-    
+
     def set_control(self, value):
         self.positive_factor = value
 
@@ -111,7 +111,7 @@ class InvasiveVegetation(VegetationModel):
         width: int = 128,
         small_radius: int = 1,
         large_radius: int = 4,
-        control: int = 8,
+        control: float = 8,
         neg_factor_nat: int = 1,
         neg_factor_inv: int = 1,
         init_method="random",
@@ -165,20 +165,11 @@ class InvasiveVegetation(VegetationModel):
         return np.clip(np.fix(raw_feedback), -1, 1).astype(int)
 
     def update(self):
-        close_neighbours_nat = count_neighbours(
-            self.grid == 1, self.close_kernel
-        )  # correct
-        close_neighbours_inv = count_neighbours(
-            self.grid == 2, self.close_kernel
-        )  # correct
+        close_neighbours_nat = count_neighbours(self.grid == 1, self.close_kernel)
+        close_neighbours_inv = count_neighbours(self.grid == 2, self.close_kernel)
 
-        # since some states are 2, will it be disproportionally doubled now?
-        far_neighbours_nat = count_neighbours(
-            self.grid == 1, self.far_kernel
-        )  # correct
-        far_neighbours_inv = count_neighbours(
-            self.grid == 2, self.far_kernel
-        )  # correct
+        far_neighbours_nat = count_neighbours(self.grid == 1, self.far_kernel)
+        far_neighbours_inv = count_neighbours(self.grid == 2, self.far_kernel)
 
         feedback_nat = self.compute_feedback(
             self.pos_factor,

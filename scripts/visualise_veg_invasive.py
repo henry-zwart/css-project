@@ -7,7 +7,7 @@ from css_project.complexity import (
     fluctuation_cluster_size,
     maximum_cluster_size,
 )
-from css_project.vegetation import InvasiveVegetation
+from css_project.vegetation import InvasiveVegetation, Vegetation
 from css_project.visualisation import animate_ca, plot_grid
 
 
@@ -360,13 +360,37 @@ def eq_after_inv(width, p_nat):
     )
 
 
+def find_phase_transition_cluster_count(width):
+    control = np.linspace(10.5, 11, 20)
+    number_of_clusters = []
+
+    for c in control:
+        vegetation = Vegetation(width, control=c)
+        vegetation.run()
+        number_of_clusters.append(count_clusters(vegetation.grid))
+
+    plt.figure(figsize=(10, 8))
+    plt.plot(control, number_of_clusters)
+    plt.title("Number of clusters for different control")
+    plt.xlabel("control")
+    plt.ylabel("Number of clusters")
+
+    plt.show()
+
+    # print("number of clusters: ", number_of_clusters)
+    # print("control: ", control)
+
+    return
+
+
 if __name__ == "__main__":
     timespan = 20
     width = 128
     p_nat = 0.25
     p_inv = 0.85
 
-    run_new_model(width, p_nat, p_inv)
+    find_phase_transition_cluster_count(width)
+    # run_new_model(width, p_nat, p_inv)
 
     # vegetation = InvasiveVegetation(width, species_prop=(p_nat, 0))
     # vegetation.run(iterations=2)
