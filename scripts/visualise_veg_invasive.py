@@ -362,7 +362,7 @@ def eq_after_inv(width, p_nat):
 
 
 def find_phase_transition_cluster_count(width):
-    control = np.linspace(8, 11.8, 100)
+    control = np.linspace(10, 11.8, 100)
     number_of_clusters = []
 
     for c in control:
@@ -374,7 +374,9 @@ def find_phase_transition_cluster_count(width):
     plt.scatter(control, number_of_clusters)
     plt.title("Number of clusters for different control")
     plt.xlabel("control")
+    plt.xscale("log")
     plt.ylabel("Number of clusters")
+    plt.yscale("log")
     plt.show()
 
 
@@ -419,14 +421,14 @@ def plot_cluster_phase_transition(width):
 
 if __name__ == "__main__":
     timespan = 20
-    width = 64
+    width = 128
     p_nat = 0.25
     p_inv = 0.85
 
     control_param = 11.0
 
-    # find_phase_transition_cluster_count(width)
-    plot_cluster_phase_transition(width)
+    find_phase_transition_cluster_count(width)
+    # plot_cluster_phase_transition(width)
     # run_new_model(width, p_nat, p_inv)
 
     # vegetation = InvasiveVegetation(width, species_prop=(p_nat, 0))
