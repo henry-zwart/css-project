@@ -1,7 +1,3 @@
-import matplotlib.pyplot as plt
-import numpy as np
-
-from css_project.vegetation import Vegetation
 from css_project.visualisation import densities_invasive_coarsegrained
 
 width = 128

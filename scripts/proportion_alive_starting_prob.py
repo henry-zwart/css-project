@@ -1,7 +1,5 @@
-import matplotlib.pyplot as plt
 import numpy as np
 
-from css_project.vegetation import Vegetation
 from css_project.visualisation import phase_transition_prob
 
 p_list = np.logspace(start=-4, stop=0, num=100, base=10)
