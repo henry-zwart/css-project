@@ -2,7 +2,7 @@ import argparse
 
 import matplotlib.pyplot as plt
 
-from css_project.logistic import Logistic
+from css_project.vegetation import Vegetation
 from css_project.visualisation import animate_ca, plot_grid
 
 if __name__ == "__main__":
@@ -15,7 +15,7 @@ if __name__ == "__main__":
     parser.add_argument("--fps", type=int, nargs="?", const=30)
     args = parser.parse_args()
 
-    model = Logistic(
+    model = Vegetation(
         args.width,
         control=args.control,
         alive_prop=args.init_density,
