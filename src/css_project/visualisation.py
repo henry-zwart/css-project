@@ -16,9 +16,9 @@ from css_project.complexity import (
 )
 from css_project.fine_grained import FineGrained
 from css_project.logistic import Logistic
+from css_project.model import VegetationModel
 
 from .logistic import LogisticTwoNative
-from .simple_ca import GameOfLife
 from .vegetation import InvasiveVegetation, Vegetation
 
 QUALITATIVE_COLOURS = [
@@ -32,7 +32,7 @@ QUALITATIVE_COLOURS = [
 ]
 
 
-def plot_grid(ca: GameOfLife, ax: Axes | None = None):
+def plot_grid(model: VegetationModel, ax: Axes | None = None):
     """Plot the static state of a cellular automaton grid.
 
     Assumes a square grid. Cells are coloured according to a
@@ -44,16 +44,16 @@ def plot_grid(ca: GameOfLife, ax: Axes | None = None):
         fig = None
     ax.set_axis_off()
     palette = mpc.ListedColormap(
-        [QUALITATIVE_COLOURS[i] for i in sorted(np.unique(ca.grid))]
+        [QUALITATIVE_COLOURS[i] for i in sorted(np.unique(model.grid))]
     )
     im_ax = ax.imshow(
-        ca.grid,
+        model.grid,
         cmap=palette,
     )
     return fig, im_ax
 
 
-def animate_ca(ca: GameOfLife, steps: int, fps: int = 5):
+def animate_ca(model: VegetationModel, steps: int, fps: int = 5):
     """Creates an animation of a cellular automata.
 
     Parameterisable via the `steps` (number of updates) and
@@ -62,14 +62,14 @@ def animate_ca(ca: GameOfLife, steps: int, fps: int = 5):
     Returns a Matplotlib Animation object which must be either
     displayed (plt.show()) or saved (ani.save(FILEPATH)).
     """
-    fig, ax = plot_grid(ca)
+    fig, ax = plot_grid(model)
 
     def update_plot(frame):
         if frame == 0:
-            ax.set_data(ca.grid)
+            ax.set_data(model.grid)
         else:
-            ca.update()
-            ax.set_data(ca.grid)
+            model.update()
+            ax.set_data(model.grid)
         return [ax]
 
     ani = animation.FuncAnimation(
