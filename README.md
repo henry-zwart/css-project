@@ -2,6 +2,8 @@
 
 [![Tests](https://github.com/henry-zwart/css-project/actions/workflows/test.yml/badge.svg)](https://github.com/henry-zwart/css-project/actions/workflows/test.yml)
 
+**Documentation:** https://henry-zwart.github.io/css-project/
+
 ## Development - Getting started
 
 This repository uses _uv_ to manage Python and its dependencies, and _pre-commit_ to run
