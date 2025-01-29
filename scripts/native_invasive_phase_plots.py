@@ -11,7 +11,7 @@ def main():
     MIN_NUTRIENT = 5  # 5
     MAX_NUTRIENT = 80  # 80
     P_INV = 0.1
-    N_STEPS = 20
+    N_STEPS = 80
     ITERS_PER_STEP = 200  # Bug
     N_REPEATS = 10
 

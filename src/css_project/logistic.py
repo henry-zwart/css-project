@@ -103,7 +103,7 @@ class LogisticTwoNative(VegetationModel):
         return 3
     
     def set_control(self, value):
-        self.positive_factor = value
+        self.supplement_rate = value
 
     def calculate_competition(
         self, count_species_1: np.ndarray, count_species_2: np.ndarray
