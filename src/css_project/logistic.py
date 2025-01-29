@@ -92,7 +92,7 @@ class Logistic(VegetationModel):
 
 
 class LogisticTwoNative(VegetationModel):
-    N_NEIGHBOURS = 13 * 13
+    N_NEIGHBOURS = kernel.NEIGHBOUR_COUNT_R6.sum()
 
     grid: np.ndarray
     nutrients: np.ndarray
@@ -146,7 +146,7 @@ class LogisticTwoNative(VegetationModel):
         competition = self.calculate_competition(nearby_species_1, nearby_species_2)
 
         unoccupied = self.grid == 0
-        DELTA_T = 0.05
+        DELTA_T = 0.5
         R = 2
 
         state_prob = np.zeros((*self.grid.shape, 3))
