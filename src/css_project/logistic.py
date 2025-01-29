@@ -92,7 +92,7 @@ class Logistic(VegetationModel):
 
 
 class LogisticTwoNative(VegetationModel):
-    N_NEIGHBOURS = 13 * 13
+    N_NEIGHBOURS = kernel.NEIGHBOUR_COUNT_R6.sum()
 
     grid: np.ndarray
     nutrients: np.ndarray
