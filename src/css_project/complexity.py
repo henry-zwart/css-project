@@ -207,7 +207,7 @@ def fluctuation_cluster_size(arr: np.ndarray) -> float:
     cluster_sizes = _get_cluster_sizes(arr)[1:]
     n_clusters = len(cluster_sizes)
     if n_clusters < 2:
-        return np.nan
+        return 0
     variance = cluster_sizes.var(ddof=1)
     area = arr.shape[0] * arr.shape[1]
     return n_clusters * variance / (area**2)

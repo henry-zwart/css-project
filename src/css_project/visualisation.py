@@ -300,7 +300,7 @@ def logistic_phase_plot(
     model_type,
     width: int,
     init_density: float,
-    init_nutrient: float,
+    init_controls: list[float],
     min_nutrient: float,
     max_nutrient: float,
     n_steps: int,
@@ -308,137 +308,141 @@ def logistic_phase_plot(
     n_repeats: int = 1,
 ) -> tuple[Figure, Axes]:
     fig, axes = plt.subplots(
-        nrows=6, ncols=1, layout="constrained", figsize=(8, 10), sharex=True
+        nrows=5, ncols=1, layout="constrained", figsize=(8, 10), sharex=True
     )
 
-    # Distribute n_steps between left and right
-    left_steps, right_steps = distribution_leftright_steps(
-        n_steps,
-        min_nutrient,
-        init_nutrient,
-        max_nutrient,
-    )
-
-    left_nutrients = np.linspace(min_nutrient, init_nutrient, left_steps)
-    right_nutrients = np.linspace(init_nutrient, max_nutrient, right_steps)
-    nutrient_vals = np.concat((left_nutrients[:-1], right_nutrients))
-
-    equilibrium_density = np.zeros((n_repeats, n_steps - 1), dtype=np.float64)
-    equilibrium_cluster_ratio = np.zeros_like(equilibrium_density)
-    equilibrium_n_clusters = np.zeros_like(equilibrium_density)
-    equilibrium_max_cluster = np.zeros_like(equilibrium_density)
-    equilibrium_variance = np.zeros_like(equilibrium_density)
-    equilibrium_fluctuation = np.zeros_like(equilibrium_density)
-
-    for repeat in trange(n_repeats):
-        # Run model till equilibrium
-        model = model_type(
-            width,
-            control=init_nutrient,
-            alive_prop=init_density,
-            random_seed=None,
-        )
-        model.run(1000)
-        initial_grid = model.grid.copy()
-
-        equilibrium_density[repeat, left_steps - 1] = model.proportion_alive()
-        equilibrium_cluster_ratio[repeat, left_steps - 1] = ratio_cluster_size(
-            model.grid
-        )
-        equilibrium_n_clusters[repeat, left_steps - 1] = count_clusters(model.grid)
-        equilibrium_max_cluster[repeat, left_steps - 1] = maximum_cluster_size(
-            model.grid
-        )
-        equilibrium_variance[repeat, left_steps - 1] = variance_cluster_size(model.grid)
-        equilibrium_fluctuation[repeat, left_steps - 1] = fluctuation_cluster_size(
-            model.grid
+    for init_nutrient in init_controls:
+        # Distribute n_steps between left and right
+        left_steps, right_steps = distribution_leftright_steps(
+            n_steps,
+            min_nutrient,
+            init_nutrient,
+            max_nutrient,
         )
 
-        # Vary control parameter upward
-        for i, ns in enumerate(nutrient_vals[left_steps:], start=left_steps):
-            model.set_control(ns)
-            model.run(iters_per_step)
-            equilibrium_density[repeat, i] = model.proportion_alive()
-            equilibrium_cluster_ratio[repeat, i] = ratio_cluster_size(model.grid)
-            equilibrium_n_clusters[repeat, i] = count_clusters(model.grid)
-            equilibrium_max_cluster[repeat, i] = maximum_cluster_size(model.grid)
-            equilibrium_variance[repeat, i] = variance_cluster_size(model.grid)
-            equilibrium_fluctuation[repeat, i] = fluctuation_cluster_size(model.grid)
+        left_nutrients = np.linspace(min_nutrient, init_nutrient, left_steps)
+        right_nutrients = np.linspace(init_nutrient, max_nutrient, right_steps)
+        nutrient_vals = np.concat((left_nutrients[:-1], right_nutrients))
 
-        # Reset grid and vary control parameter downward
-        model.grid = initial_grid
-        for bw_steps, ns in enumerate(nutrient_vals[left_steps - 2 :: -1], start=2):
-            i = left_steps - bw_steps
-            model.set_control(ns)
-            model.run(iters_per_step)
-            equilibrium_density[repeat, i] = model.proportion_alive()
-            equilibrium_cluster_ratio[repeat, i] = ratio_cluster_size(model.grid)
-            equilibrium_n_clusters[repeat, i] = count_clusters(model.grid)
-            equilibrium_max_cluster[repeat, i] = maximum_cluster_size(model.grid)
-            equilibrium_variance[repeat, i] = variance_cluster_size(model.grid)
-            equilibrium_fluctuation[repeat, i] = fluctuation_cluster_size(model.grid)
+        equilibrium_density = np.zeros((n_repeats, n_steps - 1), dtype=np.float64)
+        equilibrium_cluster_ratio = np.zeros_like(equilibrium_density)
+        equilibrium_n_clusters = np.zeros_like(equilibrium_density)
+        equilibrium_max_cluster = np.zeros_like(equilibrium_density)
+        equilibrium_variance = np.zeros_like(equilibrium_density)
+        equilibrium_fluctuation = np.zeros_like(equilibrium_density)
 
-    # print(equilibrium_cluster_ratio.mean)
-    axes[0].plot(nutrient_vals, equilibrium_density.min(axis=0))
-    axes[0].plot(nutrient_vals, equilibrium_density.max(axis=0))
-    # axes[0].scatter(nutrient_vals, equilibrium_density, s=10)
-    #    axes[0].vlines(
-    # init_nutrient, ymin=0, ymax=equilibrium_density.mean(axis=0)[left_steps - 1]
-    # )
-    axes[0].set_ylabel("Equilibrium density")
-    axes[0].set_ylim(0, 1)
+        for repeat in trange(n_repeats):
+            # Run model till equilibrium
+            model = model_type(
+                width,
+                control=init_nutrient,
+                alive_prop=init_density,
+                random_seed=None,
+            )
+            model.run(1000)
+            initial_grid = model.grid.copy()
 
-    axes[1].plot(nutrient_vals, equilibrium_n_clusters.mean(axis=0))
-    # axes[1].scatter(nutrient_vals, equilibrium_n_clusters, s=10)
-    axes[1].vlines(
-        init_nutrient, ymin=0, ymax=equilibrium_n_clusters.mean(axis=0)[left_steps - 1]
-    )
-    axes[1].set_ylabel("Cluster count")
-    axes[1].set_ylim(0, None)
+            equilibrium_density[repeat, left_steps - 1] = model.proportion_alive()
+            equilibrium_cluster_ratio[repeat, left_steps - 1] = ratio_cluster_size(
+                model.grid
+            )
+            equilibrium_n_clusters[repeat, left_steps - 1] = count_clusters(model.grid)
+            equilibrium_max_cluster[repeat, left_steps - 1] = maximum_cluster_size(
+                model.grid
+            )
+            equilibrium_variance[repeat, left_steps - 1] = variance_cluster_size(
+                model.grid
+            )
+            equilibrium_fluctuation[repeat, left_steps - 1] = fluctuation_cluster_size(
+                model.grid
+            )
 
-    axes[2].plot(nutrient_vals, equilibrium_cluster_ratio.mean(axis=0))
-    # axes[2].scatter(nutrient_vals, equilibrium_cluster_ratio, s=10)
-    axes[2].vlines(
-        init_nutrient,
-        ymin=0,
-        ymax=equilibrium_cluster_ratio.mean(axis=0)[left_steps - 1],
-    )
-    axes[2].set_ylabel("Cluster size ratio")
-    axes[2].set_ylim(0, None)
+            # Vary control parameter upward
+            for i, ns in enumerate(nutrient_vals[left_steps:], start=left_steps):
+                model.set_control(ns)
+                model.run(iters_per_step)
+                equilibrium_density[repeat, i] = model.proportion_alive()
+                equilibrium_cluster_ratio[repeat, i] = ratio_cluster_size(model.grid)
+                equilibrium_n_clusters[repeat, i] = count_clusters(model.grid)
+                equilibrium_max_cluster[repeat, i] = maximum_cluster_size(model.grid)
+                equilibrium_variance[repeat, i] = variance_cluster_size(model.grid)
+                equilibrium_fluctuation[repeat, i] = fluctuation_cluster_size(
+                    model.grid
+                )
 
-    axes[3].plot(nutrient_vals, equilibrium_max_cluster.mean(axis=0))
-    axes[3].vlines(
-        init_nutrient, ymin=0, ymax=equilibrium_max_cluster.mean(axis=0)[left_steps - 1]
-    )
-    axes[3].set_ylabel("Giant component")
-    axes[3].set_yscale("log")
-    # axes[3].set_ylim(0, 1)
+            # Reset grid and vary control parameter downward
+            model.grid = initial_grid
+            for bw_steps, ns in enumerate(nutrient_vals[left_steps - 2 :: -1], start=2):
+                i = left_steps - bw_steps
+                model.set_control(ns)
+                model.run(iters_per_step)
+                equilibrium_density[repeat, i] = model.proportion_alive()
+                equilibrium_cluster_ratio[repeat, i] = ratio_cluster_size(model.grid)
+                equilibrium_n_clusters[repeat, i] = count_clusters(model.grid)
+                equilibrium_max_cluster[repeat, i] = maximum_cluster_size(model.grid)
+                equilibrium_variance[repeat, i] = variance_cluster_size(model.grid)
+                equilibrium_fluctuation[repeat, i] = fluctuation_cluster_size(
+                    model.grid
+                )
 
-    axes[4].plot(nutrient_vals, equilibrium_variance.mean(axis=0))
-    # axes[2].scatter(nutrient_vals, equilibrium_cluster_ratio, s=10)
-    axes[4].vlines(
-        init_nutrient,
-        ymin=0,
-        ymax=equilibrium_variance.mean(axis=0)[left_steps - 1],
-    )
-    axes[4].set_ylabel("Cluster size variance")
-    axes[4].set_yscale("log")
-    # axes[4].set_ylim(0, None)
+        # print(equilibrium_cluster_ratio.mean)
+        axes[0].plot(nutrient_vals, equilibrium_density.mean(axis=0))
+        axes[0].vlines(
+            init_nutrient, ymin=0, ymax=equilibrium_density.mean(axis=0)[left_steps - 1]
+        )
+        axes[0].set_ylabel("Equilibrium density")
+        axes[0].set_ylim(0, 1)
 
-    axes[5].plot(nutrient_vals, equilibrium_fluctuation.mean(axis=0))
-    # axes[2].scatter(nutrient_vals, equilibrium_cluster_ratio, s=10)
-    axes[5].vlines(
-        init_nutrient,
-        ymin=0,
-        ymax=equilibrium_fluctuation.mean(axis=0)[left_steps - 1],
-    )
-    axes[5].set_ylabel("Cluster size fluctuation")
-    axes[5].set_yscale("log")
-    # axes[5].set_ylim(0, None)
+        axes[1].plot(nutrient_vals, equilibrium_n_clusters.mean(axis=0))
+        # axes[1].scatter(nutrient_vals, equilibrium_n_clusters, s=10)
+        axes[1].vlines(
+            init_nutrient,
+            ymin=0,
+            ymax=equilibrium_n_clusters.mean(axis=0)[left_steps - 1],
+        )
+        axes[1].set_ylabel("Cluster count")
+        axes[1].set_ylim(0, None)
+
+        axes[2].plot(nutrient_vals, equilibrium_cluster_ratio.mean(axis=0))
+        axes[2].vlines(
+            init_nutrient,
+            ymin=0,
+            ymax=equilibrium_cluster_ratio.mean(axis=0)[left_steps - 1],
+        )
+        axes[2].set_ylabel("Cluster size ratio")
+        axes[2].set_ylim(0, None)
+
+        axes[3].plot(nutrient_vals, equilibrium_max_cluster.mean(axis=0))
+        axes[3].vlines(
+            init_nutrient,
+            ymin=0,
+            ymax=equilibrium_max_cluster.mean(axis=0)[left_steps - 1],
+        )
+        axes[3].set_ylabel("Giant component")
+        axes[3].set_yscale("log")
+
+        # axes[4].plot(nutrient_vals, equilibrium_variance.mean(axis=0))
+        # axes[4].vlines(
+        #    init_nutrient,
+        #    ymin=0,
+        #    ymax=equilibrium_variance.mean(axis=0)[left_steps - 1],
+        # )
+        # axes[4].set_ylabel("Cluster size variance")
+        # axes[4].set_yscale("log")
+
+        axes[4].plot(nutrient_vals, np.nanmean(equilibrium_fluctuation, axis=0))
+        axes[4].vlines(
+            init_nutrient,
+            ymin=0,
+            ymax=np.nanmean(equilibrium_fluctuation, axis=0)[left_steps - 1],
+        )
+        axes[4].set_ylabel("Cluster size fluctuation")
+        axes[4].set_yscale("log")
 
     fig.supxlabel("Nutrient supplementation")
 
     return fig, axes
+
 
 def invasive_phase_plot(
     model_type,
@@ -489,7 +493,9 @@ def invasive_phase_plot(
 
         initial_grid = model.grid.copy()
 
-        equilibrium_density[repeat, left_steps - 1] = model.species_alive()[0]/model.area
+        equilibrium_density[repeat, left_steps - 1] = (
+            model.species_alive()[0] / model.area
+        )
         equilibrium_cluster_ratio[repeat, left_steps - 1] = ratio_cluster_size(
             model.grid
         )
@@ -506,7 +512,7 @@ def invasive_phase_plot(
         for i, ns in enumerate(nutrient_vals[left_steps:], start=left_steps):
             model.set_control(ns)
             model.run(iters_per_step)
-            equilibrium_density[repeat, i] = model.species_alive()[0]/model.area
+            equilibrium_density[repeat, i] = model.species_alive()[0] / model.area
             equilibrium_cluster_ratio[repeat, i] = ratio_cluster_size(model.grid)
             equilibrium_n_clusters[repeat, i] = count_clusters(model.grid)
             equilibrium_max_cluster[repeat, i] = maximum_cluster_size(model.grid)
@@ -519,7 +525,7 @@ def invasive_phase_plot(
             i = left_steps - bw_steps
             model.set_control(ns)
             model.run(iters_per_step)
-            equilibrium_density[repeat, i] = model.species_alive()[0]/model.area
+            equilibrium_density[repeat, i] = model.species_alive()[0] / model.area
             equilibrium_cluster_ratio[repeat, i] = ratio_cluster_size(model.grid)
             equilibrium_n_clusters[repeat, i] = count_clusters(model.grid)
             equilibrium_max_cluster[repeat, i] = maximum_cluster_size(model.grid)
