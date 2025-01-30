@@ -171,7 +171,7 @@ def phase_transition_prob(width, p_list, pos_weight_list: int | list[int]):
         iterations_list = []
         alive_list = []
         for p in p_list:
-            vegetation = Vegetation(width, positive_factor=pos_weight, alive_prop=p)
+            vegetation = Vegetation(width, control=pos_weight, alive_prop=p)
             vegetation.find_steady_state(1000)
             iterations = list(range(len(vegetation.proportion_alive_list)))
             alive_list.append(vegetation.proportion_alive_list)
@@ -215,7 +215,7 @@ def densities_invasive_logistic(width, random_seed, p):
     # Introduce invasive species
     invasive_model = LogisticTwoNative(width)
     invasive_model.grid = equilibrium_state
-    invasive_model.add_species_to_empty(p=p)
+    invasive_model.introduce_invasive(p_inv=p)
 
     invasive_model.find_steady_state(1000)
 

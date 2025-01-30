@@ -14,14 +14,14 @@ alive_grid = []
 for positive in tqdm(positives):
     prob_result = []
     for prob in initial_probs:
-        vegetation = Vegetation(width, alive_prop=prob, positive_factor=positive)
+        vegetation = Vegetation(width, alive_prop=prob, control=positive)
         vegetation.find_steady_state(1000)
         prob_result.append(vegetation.proportion_alive_list[-1])
     alive_grid.append(prob_result)
 
 alive_grid = np.array(alive_grid)
 ax = sns.heatmap(
-    alive_grid, cmap="viridis", xticklabels=initial_probs, yticklabels=positives
+    alive_grid, cmap="viridis", xticklabels=[str(x) for x in initial_probs], yticklabels=[str(x) for x in positives]
 )
 ax.set(xlabel="Initial probability", ylabel="Positive weight")
 ax.xaxis.tick_top()

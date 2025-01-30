@@ -18,7 +18,7 @@ def main():
     initial_probs = np.logspace(start=-3, stop=0, num=200)
     models = [
         [
-            Vegetation(WIDTH, positive_factor=positive, alive_prop=p)
+            Vegetation(WIDTH, control=positive, alive_prop=p)
             for p in initial_probs
         ]
         for positive in positives
@@ -39,7 +39,7 @@ def main():
     # Cluster size (maximum and ratio max-min)
     complexity_grid = np.array(complexity_grid)
 
-    sns.heatmap(complexity_grid, cmap="viridis", xticklabels=[], yticklabels=positives)
+    sns.heatmap(complexity_grid, cmap="viridis", xticklabels=[], yticklabels=[str(x) for x in positives])
 
     plt.savefig("kolmogorov_heatmap.png", dpi=500)
 
