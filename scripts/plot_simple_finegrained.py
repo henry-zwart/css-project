@@ -7,16 +7,16 @@ if __name__ == "__main__":
     model = FineGrained(
         width,
         nutrient_level=1.0,
-        nutrient_diffusion_rate=0.21,  # 0.225
+        nutrient_diffusion_rate=0.225,  # 0.225
         nutrient_consume_rate=0.1,
         nutrient_regenerate_rate=0.8,
         random_seed=None,
     )
     model.initial_grid(p=0.1)
 
-    ani = animate_nutrients(model, 600, fps=20)
-    ani.save("nutrient_diffusion.mp4")
+    ani = animate_nutrients(model, 150, fps=10)
+    ani.save("nutrient_diffusion.gif")
 
     model.reset()
-    ani = animate_ca(model, 600, fps=20)
-    ani.save("fine_grained_vegetation_spread.mp4")
+    ani = animate_ca(model, 150, fps=10)
+    ani.save("fine_grained_vegetation_spread.gif")
