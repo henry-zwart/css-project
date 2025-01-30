@@ -44,7 +44,7 @@ if __name__ == "__main__":
 
     # This code runs with invasive species
     vegetation = InvasiveVegetation(width)
-    vegetation.initial_grid()
+    vegetation.initial_grid(p=0.1)
 
     # Copy grid to use in graph
     initial_grid = vegetation.grid.copy()
@@ -57,13 +57,13 @@ if __name__ == "__main__":
 
     alive_nat = []
     alive_inv = []
-    alive_n, alive_i = vegetation.total_alive()
+    alive_n, alive_i = vegetation.species_alive()
     alive_nat.append(alive_n / total_cells)
     alive_inv.append(alive_i / total_cells)
 
     while t < timespan:
         vegetation.update()
-        alive_n, alive_i = vegetation.total_alive()
+        alive_n, alive_i = vegetation.species_alive()
         alive_nat.append(alive_n / total_cells)
         alive_inv.append(alive_i / total_cells)
         t += 1
@@ -122,7 +122,7 @@ if __name__ == "__main__":
     # native population
 
     vegetation = InvasiveVegetation(width)
-    vegetation.initial_grid(type="equilibrium")
+    vegetation.initial_grid(p=0.1, type="equilibrium")
 
     # Copy grid to use in graph
     initial_grid = vegetation.grid.copy()
@@ -137,13 +137,13 @@ if __name__ == "__main__":
 
     alive_nat = []
     alive_inv = []
-    alive_n, alive_i = vegetation.total_alive()
+    alive_n, alive_i = vegetation.species_alive()
     alive_nat.append(alive_n / total_cells)
     alive_inv.append(alive_i / total_cells)
 
     while t < t_eq:
         vegetation.update()
-        alive_n, alive_i = vegetation.total_alive()
+        alive_n, alive_i = vegetation.species_alive()
         alive_nat.append(alive_n / total_cells)
         alive_inv.append(alive_i / total_cells)
         t += 1
@@ -157,7 +157,7 @@ if __name__ == "__main__":
     t = 0
     while t < timespan:
         vegetation.update()
-        alive_n, alive_i = vegetation.total_alive()
+        alive_n, alive_i = vegetation.species_alive()
         alive_nat.append(alive_n / total_cells)
         alive_inv.append(alive_i / total_cells)
         t += 1
