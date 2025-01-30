@@ -12,7 +12,7 @@ iterations_list = []
 alive_list = []
 
 for p in tqdm(p_list):
-    model = Logistic(width, random_seed=None, alive_prop=p)
+    model = Logistic(width, alive_prop=p)
     model.run(1000)
     iterations = list(range(len(model.proportion_alive_list)))
     alive_list.append(model.proportion_alive_list)

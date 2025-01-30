@@ -3,6 +3,7 @@
 from abc import ABC, abstractmethod
 
 import numpy as np
+from numpy.random import default_rng
 
 
 class VegetationModel(ABC):
@@ -25,6 +26,7 @@ class VegetationModel(ABC):
         width: int,
         species_prop: float | np.ndarray | list[float],
         init_method: str,
+        random_seed: int | None = 42,
     ):
         """Initialises the cellular automata.
 
@@ -39,6 +41,7 @@ class VegetationModel(ABC):
         self.width = width
         self.area = width * width
         self.proportion_alive_list = []
+        self.rng = default_rng(random_seed)
         self.initial_grid(species_prop, type=init_method)
 
     @property
@@ -93,7 +96,7 @@ class VegetationModel(ABC):
         prob_ranges = np.cumsum(probs)
 
         grid = np.zeros((self.width, self.width), dtype=np.int64)
-        samples = np.random.random(grid.shape)
+        samples = self.rng.random(grid.shape)
         for i in range(len(prob_ranges) - 1):
             update_cells = (prob_ranges[i] <= samples) & (samples < prob_ranges[i + 1])
             grid[update_cells] = i
@@ -173,15 +176,15 @@ class VegetationModel(ABC):
         """
         for _ in range(iterations):
             self.update()
-    
+
     def introduce_invasive(self, p_inv=0.1, type="empty"):
         if type == "random":
-            random_matrix = np.random.random(self.grid.shape)
+            random_matrix = self.rng.random(self.grid.shape)
             self.grid[np.where(random_matrix <= p_inv)] = 2
         elif type == "empty":
             empty_grid = self.grid == 0
             random_cells = (empty_grid).sum()
-            random_nrs = np.random.random(random_cells)
+            random_nrs = self.rng.random(random_cells)
             self.grid[empty_grid] = np.where(random_nrs < p_inv, 2, 0)
         else:
             raise ValueError("No valid type for invasive introduction")

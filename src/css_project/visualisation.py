@@ -337,7 +337,6 @@ def logistic_phase_plot(
                 width,
                 control=init_nutrient,
                 alive_prop=init_density,
-                random_seed=None,
             )
             model.run(1000)
             initial_grid = model.grid.copy()
@@ -485,7 +484,6 @@ def invasive_phase_plot(
             width,
             control=init_nutrient,
             species_prop=(init_density, 0),
-            random_seed=None,
         )
         model.run(1000)
         model.introduce_invasive(p_inv)

@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.random import default_rng
 
 
 class GameOfLife:
@@ -6,12 +7,13 @@ class GameOfLife:
 
     grid: np.ndarray
 
-    def __init__(self, width: int = 128):
+    def __init__(self, width: int = 128, random_seed: int | None = 42):
+        self.rng = default_rng(random_seed)
         self.grid = np.zeros((width, width), dtype=int)
         self.width = width
 
     def initial_grid(self, p):
-        random_matrix = np.random.random(self.grid.shape)
+        random_matrix = self.rng.random(self.grid.shape)
         self.grid = np.where(random_matrix < p, 1, 0)
 
     def find_neighbors(self, x, y):
