@@ -5,8 +5,6 @@ from css_project.kernel import neighbour_count_kernel
 
 from .model import VegetationModel
 
-# np.random.seed(2)
-
 
 class Vegetation(VegetationModel):
     """Vegetation cellular automata model for native species.
@@ -40,7 +38,7 @@ class Vegetation(VegetationModel):
         negative_factor: int = 1,
         init_method="random",
         alive_prop: float = 0.5,
-        random_seed = None
+        random_seed: int | None = 42,
     ):
         """Initialise the Vegetation cellular automata model.
 
@@ -55,7 +53,7 @@ class Vegetation(VegetationModel):
             init_method: Method used to initialise population on the grid.
             alive_prop: Initial proportion of occupied cells.
         """
-        super().__init__(width, alive_prop, init_method)
+        super().__init__(width, alive_prop, init_method, random_seed)
         self.positive_factor = control
         self.negative_factor = negative_factor
         self.close_kernel = neighbour_count_kernel(small_radius)
@@ -65,7 +63,7 @@ class Vegetation(VegetationModel):
     def n_states(self) -> int:
         """Number of states in the model."""
         return 2
-    
+
     def set_control(self, value):
         self.positive_factor = value
 
@@ -116,9 +114,9 @@ class InvasiveVegetation(VegetationModel):
         neg_factor_inv: int = 1,
         init_method="random",
         species_prop: list[float] | tuple[float, float] | np.ndarray = (0.25, 0.25),
-        random_seed = None
+        random_seed: int | None = 42,
     ):
-        super().__init__(width, list(species_prop), init_method)
+        super().__init__(width, list(species_prop), init_method, random_seed)
         self.small_radius = small_radius
         self.large_radius = large_radius
         self.pos_factor = control
@@ -132,7 +130,7 @@ class InvasiveVegetation(VegetationModel):
     @property
     def n_states(self) -> int:
         return 3
-    
+
     def set_control(self, value):
         self.pos_factor = value
 
@@ -210,7 +208,7 @@ class InvasiveVegetation(VegetationModel):
 
         # Find cells where we need to choose between 1 and 2
         cells_eq = (dead_cell & feedback_nat_eq_inv & feedback_nat_gt_0).sum()
-        random_nrs = np.random.random(cells_eq)
+        random_nrs = self.rng.random(cells_eq)
         self.grid[dead_cell & feedback_nat_eq_inv & feedback_nat_gt_0] = np.where(
             random_nrs < 0.5, 1, 2
         )

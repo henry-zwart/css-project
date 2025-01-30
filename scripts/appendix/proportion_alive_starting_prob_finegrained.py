@@ -13,7 +13,7 @@ iterations_list = []
 alive_list = []
 
 for p in tqdm(p_list):
-    model = FineGrained(width, random_seed=None)
+    model = FineGrained(width)
     model.initial_grid(p)
     model.find_steady_state(1000)
     iterations = list(range(len(model.proportion_alive_list)))

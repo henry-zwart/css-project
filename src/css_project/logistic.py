@@ -1,6 +1,5 @@
 import numpy as np
 from numba import njit
-from numpy.random import default_rng
 from scipy import signal
 
 from . import kernel
@@ -50,8 +49,7 @@ class Logistic(VegetationModel):
         alive_prop: float = 0.01,
         init_method: str = "random",
     ):
-        super().__init__(width, alive_prop, init_method)
-        self.rng = default_rng(random_seed)
+        super().__init__(width, alive_prop, init_method, random_seed)
         self.transition_prob = np.zeros_like(self.grid, dtype=np.float64)
         self.consume_rate = consume_rate
         self.supplement_rate = control
@@ -107,8 +105,7 @@ class LogisticTwoNative(VegetationModel):
         init_method: str = "random",
         random_seed: int | None = 42,
     ):
-        super().__init__(width, list(species_prop), init_method)
-        self.rng = default_rng(random_seed)
+        super().__init__(width, list(species_prop), init_method, random_seed)
         self.transition_prob = np.zeros((*self.grid.shape, 3), dtype=np.float64)
         self.consume_rate_1 = consume_rate_1
         self.consume_rate_2 = consume_rate_2

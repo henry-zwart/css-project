@@ -10,7 +10,6 @@ if __name__ == "__main__":
         nutrient_diffusion_rate=0.225,  # 0.225
         nutrient_consume_rate=0.1,
         nutrient_regenerate_rate=0.8,
-        random_seed=None,
     )
     model.initial_grid(p=0.1)
 
