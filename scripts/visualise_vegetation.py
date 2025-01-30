@@ -21,7 +21,7 @@ if __name__ == "__main__":
     vegetation.grid = initial_grid.copy()
 
     fig, ax = plot_grid(vegetation)
-    fig.savefig("veg_grid.png", dpi=300)
+    fig.savefig("results/veg_grid.png", dpi=300)
 
     t = 0
     total_cells = width * width
@@ -33,7 +33,7 @@ if __name__ == "__main__":
         t += 1
 
     fig, ax = plot_grid(vegetation)
-    fig.savefig("veg_grid_after.png", dpi=300)
+    fig.savefig("results/veg_grid_after.png", dpi=300)
 
     # Plot ratio of alive vs dead cells
     # vegetation = Vegetation(128)
@@ -50,7 +50,7 @@ if __name__ == "__main__":
     initial_grid = vegetation.grid.copy()
 
     fig, ax = plot_grid(vegetation)
-    fig.savefig("veg_grid.png", dpi=300)
+    fig.savefig("results/veg_grid.png", dpi=300)
 
     t = 0
     total_cells = width * width
@@ -69,7 +69,7 @@ if __name__ == "__main__":
         t += 1
 
     fig, ax = plot_grid(vegetation)
-    fig.savefig("veg_grid_after.png", dpi=300)
+    fig.savefig("results/veg_grid_after.png", dpi=300)
 
     # Reset grid to initial state
     vegetation.grid = initial_grid.copy()
@@ -87,7 +87,7 @@ if __name__ == "__main__":
     plt.title("Proportion of Native and Invasive species vs Iterations")
     plt.xlabel("Time Step")
     plt.ylabel("Proportion Cells")
-    plt.savefig("proportion_nat_inv.png", dpi=300)
+    plt.savefig("results/proportion_nat_inv.png", dpi=300)
 
     # Cluster size distribution
 
@@ -115,7 +115,7 @@ if __name__ == "__main__":
     plt.title("Cluster size distribution")
     plt.xlabel("Cluster size")
     plt.ylabel("Number of patches")
-    plt.savefig("cluster_size_distribution.png", dpi=300)
+    plt.savefig("results/cluster_size_distribution.png", dpi=300)
     plt.show()
 
     # This code introduces invasive species (randomly) after establishing
@@ -128,7 +128,7 @@ if __name__ == "__main__":
     initial_grid = vegetation.grid.copy()
 
     fig, ax = plot_grid(vegetation)
-    fig.savefig("veg_grid.png", dpi=300)
+    fig.savefig("results/veg_grid.png", dpi=300)
 
     t = 0
     t_eq = 25
@@ -149,7 +149,7 @@ if __name__ == "__main__":
         t += 1
 
     fig, ax = plot_grid(vegetation)
-    fig.savefig("veg_grid_before_inv.png", dpi=300)
+    fig.savefig("results/veg_grid_before_inv.png", dpi=300)
 
     # Introduce invasive species
     vegetation.introduce_invasive(p_inv=0.1, type="random")
@@ -178,7 +178,7 @@ if __name__ == "__main__":
     plt.title("Proportion of Native and Invasive species vs Iterations")
     plt.xlabel("Time Step")
     plt.ylabel("Proportion Cells")
-    plt.savefig("proportion_nat_inv.png", dpi=300)
+    plt.savefig("results/proportion_nat_inv.png", dpi=300)
 
     """# Cluster size distribution
 
@@ -206,5 +206,5 @@ if __name__ == "__main__":
     plt.title("Cluster size distribution")
     plt.xlabel("Cluster size")
     plt.ylabel("Number of patches")
-    plt.savefig("cluster_size_distribution.png", dpi=300)
+    plt.savefig("results/cluster_size_distribution.png", dpi=300)
     plt.show()"""

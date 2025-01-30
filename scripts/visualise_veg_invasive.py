@@ -29,7 +29,7 @@ def plot_proportion(alive_nat, alive_inv):
     plt.title("Proportion of Native and Invasive species vs Iterations")
     plt.xlabel("Time Step")
     plt.ylabel("Proportion Cells")
-    plt.savefig("proportion_nat_inv.png", dpi=300)
+    plt.savefig("results/proportion_nat_inv.png", dpi=300)
 
 
 def run_animation(vegetation, timespan):
@@ -49,7 +49,7 @@ def run_model(
     vegetation = InvasiveVegetation(width, species_prop=(p_nat, 0.0))
     fig, ax = plot_grid(vegetation)
 
-    fig.savefig("veg_grid.png", dpi=300)
+    fig.savefig("results/veg_grid.png", dpi=300)
 
     if initial_state == "equilibrium":
         t = 0
@@ -69,7 +69,7 @@ def run_model(
             t += 1
 
         fig, ax = plot_grid(vegetation)
-        fig.savefig("veg_grid_before_inv.png", dpi=300)
+        fig.savefig("results/veg_grid_before_inv.png", dpi=300)
 
         # Introduce invasive species
         vegetation.introduce_invasive(p_inv, inv_type)
@@ -171,7 +171,7 @@ def run_model_multiple(
         plt.xlabel("Time Step")
         plt.ylabel("Proportion of Cells")
         plt.legend(loc="upper right", fontsize="small")
-        plt.savefig("proportion_nat_gradient_eq.png", dpi=300)
+        plt.savefig("results/proportion_nat_gradient_eq.png", dpi=300)
         plt.show()
 
     elif initial_state == "random":
@@ -234,7 +234,7 @@ def run_model_multiple(
         plt.xlabel("Time Step")
         plt.ylabel("Proportion of Cells")
         plt.legend(loc="upper right", fontsize="small")
-        plt.savefig("proportion_nat_gradient_random.png", dpi=300)
+        plt.savefig("results/proportion_nat_gradient_random.png", dpi=300)
         plt.show()
 
     else:
