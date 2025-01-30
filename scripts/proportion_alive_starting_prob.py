@@ -8,5 +8,5 @@ pos_weight_list = [5, 7, 9]
 
 fig1, fig2 = phase_transition_prob(width, p_list, pos_weight_list)
 
-fig1.savefig("proportion_alive_over_iter", dpi=300)
-fig2.savefig("proportion_alive_on_probability", dpi=300)
+fig1.savefig("results/proportion_alive_over_iter", dpi=300)
+fig2.savefig("results/proportion_alive_on_probability", dpi=300)

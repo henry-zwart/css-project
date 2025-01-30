@@ -16,7 +16,7 @@ def main():
         n_repeats=10,
     )
 
-    fig.savefig("native_vegetation_phaseplot.png", dpi=300)
+    fig.savefig("results/native_vegetation_phaseplot.png", dpi=300)
 
     fig, _ = logistic_phase_plot(
         Logistic,
@@ -30,7 +30,7 @@ def main():
         n_repeats=10,
     )
 
-    fig.savefig("native_logistic_phaseplot.png", dpi=300)
+    fig.savefig("results/native_logistic_phaseplot.png", dpi=300)
 
 
 if __name__ == "__main__":

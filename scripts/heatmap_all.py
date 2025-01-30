@@ -225,8 +225,8 @@ def main():
         init_steps=500,
         control_value_name="Positive feedback weight",
     )
-    fig.savefig("heatmaps_all_native_vegetation.png", dpi=500)
-    phase.savefig("phaseplot_native_vegetation.png", dpi=500)
+    fig.savefig("results/heatmaps_all_native_vegetation.png", dpi=500)
+    phase.savefig("results/phaseplot_native_vegetation.png", dpi=500)
 
     nutrient_level = np.linspace(start=0.001, stop=70, num=80)
     initial_probs = np.logspace(start=-6, stop=0, num=80)
@@ -240,8 +240,8 @@ def main():
         control_value_name="Nutrient availability",
     )
 
-    fig.savefig("heatmaps_all_native_logistic.png", dpi=500)
-    phase.savefig("phaseplot_native_logistic.png", dpi=500)
+    fig.savefig("results/heatmaps_all_native_logistic.png", dpi=500)
+    phase.savefig("results/phaseplot_native_logistic.png", dpi=500)
 
 
 if __name__ == "__main__":

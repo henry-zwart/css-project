@@ -6,4 +6,4 @@ p = 0.9
 
 fig1 = densities_invasive_logistic(width, random_seed, p)
 
-fig1.savefig("species_densities_logistic", dpi=300)
+fig1.savefig("results/species_densities_logistic", dpi=300)

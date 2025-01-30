@@ -6,4 +6,4 @@ p_inv = 0.3
 
 fig1 = densities_invasive_coarsegrained(width, p_nat, p_inv)
 
-fig1.savefig("species_densities_coarsegrained", dpi=300)
+fig1.savefig("results/species_densities_coarsegrained", dpi=300)
