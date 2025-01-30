@@ -24,7 +24,10 @@ for positive in tqdm(positives):
 
 alive_grid = np.array(alive_grid)
 ax = sns.heatmap(
-    alive_grid, cmap="viridis", xticklabels=[str(x) for x in negatives], yticklabels=[str(x) for x in positives]
+    alive_grid,
+    cmap="viridis",
+    xticklabels=[str(x) for x in negatives],
+    yticklabels=[str(x) for x in positives],
 )
 ax.set(xlabel="Negative weight", ylabel="Positive weight")
 ax.xaxis.tick_top()
