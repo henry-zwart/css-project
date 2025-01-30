@@ -104,25 +104,23 @@ def main():
     ax.set_ylabel("Compressed size")
     ax.set_title("KC estimated as compressed size (50 updates)")
     fig.legend()
-    fig.savefig("results/kolmogorov_complexity.png")
+    fig.savefig("kolmogorov_complexity.png")
 
     # Coarse-grained model
     complexities_fig, examples_fig, islands_fig = plot_cluster_complexity(
         cg_models, weight
     )
-    complexities_fig.savefig(f"results/cg_cluster_complexity_{WIDTH}.png", dpi=500)
-    examples_fig.savefig(f"results/cg_complexity_examples_{WIDTH}.png", dpi=500)
-    islands_fig.savefig(f"results/cg_islands_{WIDTH}.png", dpi=500)
+    complexities_fig.savefig(f"cg_cluster_complexity_{WIDTH}.png", dpi=500)
+    examples_fig.savefig(f"cg_complexity_examples_{WIDTH}.png", dpi=500)
+    islands_fig.savefig(f"cg_islands_{WIDTH}.png", dpi=500)
 
     # Logistic model
     complexities_fig, examples_fig, islands_fig = plot_cluster_complexity(
         log_models, nutrient
     )
-    complexities_fig.savefig(
-        f"results/logistic_cluster_complexity_{WIDTH}.png", dpi=500
-    )
-    examples_fig.savefig(f"results/logistic_complexity_examples_{WIDTH}.png", dpi=500)
-    islands_fig.savefig(f"results/logistic_islands_{WIDTH}.png", dpi=500)
+    complexities_fig.savefig(f"logistic_cluster_complexity_{WIDTH}.png", dpi=500)
+    examples_fig.savefig(f"logistic_complexity_examples_{WIDTH}.png", dpi=500)
+    islands_fig.savefig(f"logistic_islands_{WIDTH}.png", dpi=500)
 
 
 if __name__ == "__main__":

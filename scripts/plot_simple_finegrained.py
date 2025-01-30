@@ -15,8 +15,8 @@ if __name__ == "__main__":
     model.initial_grid(p=0.1)
 
     ani = animate_nutrients(model, 150, fps=10)
-    ani.save("nutrient_diffusion.gif")
+    ani.save("results/nutrient_diffusion.gif")
 
     model.reset()
     ani = animate_ca(model, 150, fps=10)
-    ani.save("fine_grained_vegetation_spread.gif")
+    ani.save("results/fine_grained_vegetation_spread.gif")

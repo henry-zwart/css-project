@@ -212,7 +212,7 @@ def make_heatmaps(
 
 def main():
     # Prepare states
-    WIDTH = 256
+    WIDTH = 32
 
     positives = np.linspace(start=1, stop=20, num=80)
     initial_probs = np.logspace(start=-3, stop=0, num=80)

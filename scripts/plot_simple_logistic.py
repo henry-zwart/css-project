@@ -18,4 +18,4 @@ if __name__ == "__main__":
 
     model.introduce_invasive(1.0)
     ani = animate_ca(model, 1000, fps=30)
-    ani.save("logistic_two_species.mp4")
+    ani.save("results/logistic_two_species.mp4")
