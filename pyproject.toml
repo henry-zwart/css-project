@@ -16,6 +16,7 @@ dependencies = [
     "numba>=0.61.0",
     #"numpy>=2.2.2",
     "numpy",
+    "pdoc>=15.0.1",
     "powerlaw>=1.5",
     "pytest>=8.3.4",
     "scipy>=1.15.1",
