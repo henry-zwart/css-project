@@ -25,7 +25,7 @@ QUALITATIVE_COLOURS = [
     "#CCBB44",
     "#228833",
     "#AA3377",
-    "#FFFFFF",
+    # "#FFFFFF",
     "#4477AA",
     "#66CCEE",
     "#EE6677",
