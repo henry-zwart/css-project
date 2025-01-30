@@ -32,4 +32,4 @@ ax = sns.heatmap(
 ax.set(xlabel="Negative weight", ylabel="Positive weight")
 ax.xaxis.tick_top()
 plt.title(f"Proportion of alive cells with starting p={p}")
-plt.savefig("proportion_weighted_heatmap.png")
+plt.savefig("appendix_results/proportion_weighted_heatmap.png")

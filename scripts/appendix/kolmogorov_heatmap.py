@@ -43,7 +43,7 @@ def main():
         yticklabels=[str(x) for x in positives],
     )
 
-    plt.savefig("kolmogorov_heatmap.png", dpi=500)
+    plt.savefig("appendix_results/kolmogorov_heatmap.png", dpi=500)
 
 
 if __name__ == "__main__":

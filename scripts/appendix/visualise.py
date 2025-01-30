@@ -19,7 +19,7 @@ if __name__ == "__main__":
     game_of_life.grid = initial_grid.copy()
 
     fig, ax = plot_grid(game_of_life)
-    fig.savefig("test_grid.png", dpi=300)
+    fig.savefig("appendix_results/test_grid.png", dpi=300)
 
     # Plot the proportion of alive cells over time
     t = 0
@@ -39,4 +39,4 @@ if __name__ == "__main__":
     plt.title("Proportion of Alive Cells vs Iterations")
     plt.xlabel("Time Step")
     plt.ylabel("Proportion of Alive Cells")
-    plt.savefig("proportion_alive.png", dpi=300)
+    plt.savefig("appendix_results/proportion_alive.png", dpi=300)

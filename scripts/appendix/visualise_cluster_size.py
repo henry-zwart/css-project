@@ -54,7 +54,7 @@ if __name__ == "__main__":
     plt.title("Cluster size distribution")
     plt.xlabel("Cluster size")
     plt.ylabel("Number of patches")
-    plt.savefig("cluster_size_distribution.png", dpi=300)
+    plt.savefig("appendix_results/cluster_size_distribution.png", dpi=300)
 
     # Use powerlaw package to fit the data
     results = powerlaw.Fit(clusters)
@@ -68,4 +68,4 @@ if __name__ == "__main__":
     plt.xlabel("Cluster Size")
     plt.ylabel("Probability Density")
     plt.title("Cluster Size Power Law")
-    plt.savefig("cluster_size_power_law.png", dpi=300)
+    plt.savefig("appendix_results/cluster_size_power_law.png", dpi=300)

@@ -29,4 +29,4 @@ ax = sns.heatmap(
 ax.set(xlabel="Initial probability", ylabel="Positive weight")
 ax.xaxis.tick_top()
 plt.title("Proportion of alive cells")
-plt.savefig("proportion_positive_weight_probability_heatmap.png")
+plt.savefig("appendix_results/proportion_positive_weight_probability_heatmap.png")
