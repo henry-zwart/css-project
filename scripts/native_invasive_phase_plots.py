@@ -1,6 +1,5 @@
-from css_project.visualisation import invasive_phase_plot
 from css_project.logistic import LogisticTwoNative
-from css_project.vegetation import InvasiveVegetation
+from css_project.visualisation import invasive_phase_plot
 
 
 def main():
