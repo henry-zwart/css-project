@@ -6,4 +6,4 @@ pos_weight_list = np.linspace(0, 20, 21)
 width = 64
 
 fig = phase_transition_pos_weight(width, pos_weight_list)
-fig.savefig("proportion_alive_on_pos_weight", dpi=300)
+fig.savefig("appendix_results/proportion_alive_on_pos_weight", dpi=300)

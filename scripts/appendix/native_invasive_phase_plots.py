@@ -27,7 +27,7 @@ def main():
         N_REPEATS,
     )
 
-    fig.savefig("native_invasive_phaseplot.png", dpi=300)
+    fig.savefig("appendix_results/native_invasive_phaseplot.png", dpi=300)
 
 
 if __name__ == "__main__":
