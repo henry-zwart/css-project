@@ -1,32 +1,36 @@
-from css_project.visualisation import logistic_phase_plot
 from css_project.logistic import Logistic
 from css_project.vegetation import Vegetation
+from css_project.visualisation import logistic_phase_plot
 
 
 def main():
-    MODEL_TYPE = Vegetation
-    WIDTH = 100
-    INIT_DENSITY = 0.01
-    INITIAL_NUTRIENT_AVAILABILITY = 10
-    MIN_NUTRIENT = 5  # 5
-    MAX_NUTRIENT = 20  # 80
-    N_STEPS = 20
-    ITERS_PER_STEP = 200  # Bug
-    N_REPEATS = 10
-
     fig, _ = logistic_phase_plot(
-        MODEL_TYPE,
-        WIDTH,
-        INIT_DENSITY,
-        INITIAL_NUTRIENT_AVAILABILITY,
-        MIN_NUTRIENT,
-        MAX_NUTRIENT,
-        N_STEPS,
-        ITERS_PER_STEP,
-        N_REPEATS,
+        Vegetation,
+        128,
+        0.01,
+        [6, 10, 15],
+        min_nutrient=5,
+        max_nutrient=20,
+        n_steps=20,
+        iters_per_step=200,
+        n_repeats=10,
     )
 
-    fig.savefig("native_phaseplot.png", dpi=300)
+    fig.savefig("native_vegetation_phaseplot.png", dpi=300)
+
+    fig, _ = logistic_phase_plot(
+        Logistic,
+        128,
+        0.01,
+        [6.0, 26.0, 55.0, 65.0],
+        min_nutrient=1,
+        max_nutrient=80,
+        n_steps=80,
+        iters_per_step=200,
+        n_repeats=10,
+    )
+
+    fig.savefig("native_logistic_phaseplot.png", dpi=300)
 
 
 if __name__ == "__main__":
