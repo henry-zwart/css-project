@@ -73,10 +73,9 @@ def plot_cluster_complexity(models: Sequence[VegetationModel], values):
 
 def main():
     # Prepare states
-    WIDTH = 64
-    WIDTH = 128
+    WIDTH = 256
     cg_p = 0.01
-    lo_p = 0.001
+    lo_p = 0.01
 
     weight = (3, 4, 6, 8, 9, 10, 11, 13, 17)
     nutrient = (1, 5, 10, 15, 25, 35, 45, 55, 65)
