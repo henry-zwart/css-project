@@ -1,11 +1,12 @@
+import argparse
+
 from tqdm import trange
 
 from css_project.logistic import LogisticTwoNative
 from css_project.visualisation import animate_ca
 
-if __name__ == "__main__":
-    width = 256
 
+def main(width: int, frames: int):
     model = LogisticTwoNative(
         width,
         consume_rate_1=63.7,
@@ -17,5 +18,24 @@ if __name__ == "__main__":
         model.update()
 
     # model.introduce_invasive(1.0)
-    ani = animate_ca(model, 20, fps=2)
+    ani = animate_ca(model, frames, fps=2)
     ani.save("results/logistic_two_species.mp4")
+
+
+if __name__ == "__main__":
+    QUICK_WIDTH = 128
+    QUICK_FRAMES = 20
+    FULL_WIDTH = 256
+    FULL_FRAMES = 20
+
+    parser = argparse.ArgumentParser(
+        prog="LogisticPlot",
+        description="Create animation of logistic model",
+    )
+    parser.add_argument("--quick", action="store_true")
+    args = parser.parse_args()
+
+    if args.quick:
+        main(QUICK_WIDTH, QUICK_FRAMES)
+    else:
+        main(FULL_WIDTH, FULL_FRAMES)

@@ -1,3 +1,4 @@
+import argparse
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
 import matplotlib.colors as colors
@@ -170,7 +171,6 @@ def make_heatmaps(
     #   - Single cluster
     #   - Nontrivial density (e.g. > 0.1)
     phases[one_cluster & nontrivial_density] = 5
-    print(np.unique(phases))
 
     phase_fig, phase_ax = plt.subplots(layout="constrained")
 
@@ -210,16 +210,14 @@ def make_heatmaps(
     return fig, phase_fig
 
 
-def main():
+def main(width: int, resolution: int):
     # Prepare states
-    WIDTH = 256
-
-    positives = np.linspace(start=1, stop=20, num=80)
-    initial_probs = np.logspace(start=-6, stop=0, num=80)
+    positives = np.linspace(start=1, stop=20, num=resolution)
+    initial_probs = np.logspace(start=-6, stop=0, num=resolution)
 
     fig, phase = make_heatmaps(
         Vegetation,
-        WIDTH,
+        width,
         initial_probs,
         positives,
         init_steps=500,
@@ -228,11 +226,11 @@ def main():
     fig.savefig("results/heatmaps_all_native_vegetation.png", dpi=500)
     phase.savefig("results/phaseplot_native_vegetation.png", dpi=500)
 
-    nutrient_level = np.linspace(start=0.001, stop=70, num=80)
+    nutrient_level = np.linspace(start=0.001, stop=70, num=resolution)
 
     fig, phase = make_heatmaps(
         Logistic,
-        WIDTH,
+        width,
         initial_probs,
         nutrient_level,
         init_steps=1000,
@@ -244,4 +242,18 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    QUICK_WIDTH = 128
+    QUICK_RESOLUTION = 15
+    FULL_WIDTH = 256
+    FULL_RESOLUTION = 80
+
+    parser = argparse.ArgumentParser(
+        prog="Heatmaps", description="Generate heatmaps and phase diagrams"
+    )
+    parser.add_argument("--quick", action="store_true")
+    args = parser.parse_args()
+
+    if args.quick:
+        main(width=QUICK_WIDTH, resolution=QUICK_RESOLUTION)
+    else:
+        main(width=FULL_WIDTH, resolution=FULL_RESOLUTION)
