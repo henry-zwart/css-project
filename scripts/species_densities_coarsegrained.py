@@ -1,3 +1,6 @@
+"""
+Visualise species densities over time for coarse-grained model.
+"""
 from css_project.visualisation import densities_invasive_coarsegrained
 
 width = 128

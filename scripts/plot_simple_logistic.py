@@ -1,3 +1,4 @@
+"""Make an animation of the vegetation over time of the logistic model."""
 import argparse
 
 from tqdm import trange

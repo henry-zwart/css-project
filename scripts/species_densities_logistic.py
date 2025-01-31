@@ -1,3 +1,7 @@
+"""
+Visualise species densities over time for logistic model.
+"""
+
 from css_project.visualisation import densities_invasive_logistic
 
 width = 128
