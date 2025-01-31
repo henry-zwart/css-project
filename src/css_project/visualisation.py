@@ -288,19 +288,44 @@ def densities_invasive_coarsegrained(width, p_nat, p_inv):
     over time in the coarse-grained model. The invasive species is added
     after a steady state is reached."""
     # Run model until steady state
+    native = []
+    invasive = []
+    dead = []
+    total = width * width
+
     model = InvasiveVegetation(width, species_prop=(p_nat, 0))
-    model.run(100)
+    native.append((model.species_alive()[0]) / total)
+    invasive.append((model.species_alive()[1]) / total)
+    dead.append((total - (model.species_alive()[0] + model.species_alive()[1])) / total)
+
+    t = 0
+    timespan = 25
+    while t < timespan:
+        model.update()
+        native.append((model.species_alive()[0]) / total)
+        invasive.append((model.species_alive()[1]) / total)
+        dead.append(
+            (total - (model.species_alive()[0] + model.species_alive()[1])) / total
+        )
+        t += 1
 
     model.introduce_invasive(p_inv=p_inv)
+    native.append((model.species_alive()[0]) / total)
+    invasive.append((model.species_alive()[1]) / total)
+    dead.append((total - (model.species_alive()[0] + model.species_alive()[1])) / total)
 
-    model.run(100)
+    t = 0
+    timespan = 25
+    while t < timespan:
+        model.update()
+        native.append((model.species_alive()[0]) / total)
+        invasive.append((model.species_alive()[1]) / total)
+        dead.append(
+            (total - (model.species_alive()[0] + model.species_alive()[1])) / total
+        )
+        t += 1
 
-    # Calculate proportions of native, invasive and empty cells
-    native = model.proportion_native_alive_list
-    invasive = model.proportion_invasive_alive_list
-    iterations = list(range(len(model.proportion_native_alive_list)))
-
-    dead = [1 - x for x in [a + b for a, b in zip(native, invasive, strict=False)]]
+    iterations = list(range(len(native)))
 
     # Plot
     fig1 = plt.figure(figsize=(8, 6))
@@ -308,7 +333,7 @@ def densities_invasive_coarsegrained(width, p_nat, p_inv):
     plt.plot(iterations, native, label="Native Species")
     plt.plot(iterations, invasive, label="Invasive Species")
     plt.plot(iterations, dead, label="Empty Cells")
-    plt.axhline(y=dead[-1], color="r", linestyle="--", linewidth="0.8")
+    plt.axhline(y=native[-1], color="r", linestyle="--", linewidth="0.8")
     plt.title("Proportion of Species over Time")
     plt.xlabel("Time Step")
     plt.ylabel("Proportion of Species")
