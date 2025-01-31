@@ -12,6 +12,6 @@ species_densities_coarsegrained.py (species_densities_coarsegrained)
 
 species_densities_logistic.py (species_densities_logistic)
 
-visualize_veg_invasive.py (native_pres_eq_invasive_proportions.png)
+visualize.py (native_pres_eq_invasive_proportions.png)
 
 proportion_alive_starting_prob.py (proportion_alive_on_probability.png)

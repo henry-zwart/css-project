@@ -1,3 +1,5 @@
+"""Make an animation of both the vegetation dynamics over time and 
+the nutrient diffusion of the fine-grained model."""
 import argparse
 
 from css_project.fine_grained import FineGrained

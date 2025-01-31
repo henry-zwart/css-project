@@ -104,6 +104,15 @@ class Vegetation(VegetationModel):
 
 
 class InvasiveVegetation(VegetationModel):
+    """Vegetation cellular automata model for native and invasive species.
+
+    Vegetation growth is governed by a neighborhood feedback rule. Positive
+    and negative feedbacks scale linearly with the quantity of both vegetation in
+    separate radii. The former reflects the positive contribution of nearby
+    vegetation to soil quality. The latter reflects the competition for local
+    resources (nutrients). Both species are assumed to have the same positive factor.
+    """
+
     def __init__(
         self,
         width: int = 128,
@@ -116,6 +125,22 @@ class InvasiveVegetation(VegetationModel):
         species_prop: list[float] | tuple[float, float] | np.ndarray = (0.25, 0.25),
         random_seed: int | None = 42,
     ):
+        """Initialise the InvasiveVegetation cellular automata model.
+
+        Args:
+            width: The number of cells in one side of the cellular automata grid.
+            small_radius: The square radius within which to count neighbors for
+                positive feedback.
+            large_radius: The square radius within which to count neighbors for
+                negative feedback.
+            control: Weight coefficient applied to the positive feedback.
+            neg_factor_nat: Weight coefficient applied to negative feedback for
+                native species.
+            neg_factor_inv: Weight coefficient applied to negative feedback for
+                invasive species.
+            init_method: Method used to initialise population on the grid.
+            species_prop: Initial proportion of occupied cells by species.
+        """
         super().__init__(width, list(species_prop), init_method, random_seed)
         self.small_radius = small_radius
         self.large_radius = large_radius
@@ -129,9 +154,11 @@ class InvasiveVegetation(VegetationModel):
 
     @property
     def n_states(self) -> int:
+        """Number of states in the model."""
         return 3
 
     def set_control(self, value):
+        """(Re)Establishes the positive factor."""
         self.pos_factor = value
 
     def compute_feedback(
@@ -163,21 +190,27 @@ class InvasiveVegetation(VegetationModel):
         return np.clip(np.fix(raw_feedback), -1, 1).astype(int)
 
     def update(self):
-        """Simulate one step"""
-        close_neighbours_nat = count_neighbours(
-            self.grid == 1, self.close_kernel
-        )  # correct
-        close_neighbours_inv = count_neighbours(
-            self.grid == 2, self.close_kernel
-        )  # correct
 
-        # since some states are 2, will it be disproportionally doubled now?
-        far_neighbours_nat = count_neighbours(
-            self.grid == 1, self.far_kernel
-        )  # correct
-        far_neighbours_inv = count_neighbours(
-            self.grid == 2, self.far_kernel
-        )  # correct
+        """Perform a single transition on the grid.
+
+        Calculate the feedback for each cell in the grid.
+        Feedback:
+            Native cells:
+            - **-1:** Cell dies
+            - **0** and **1***: Cell retains its state
+            Invasive cells:
+            - **-1:** Cell dies
+            - **0** and **1***: Cell retains its state
+            Empty cells:
+            - **1**: Cell becomes alive (or stays alive)
+                Highest positive factor grows
+                Equal positive factor chosen randomly
+        """
+        close_neighbours_nat = count_neighbours(self.grid == 1, self.close_kernel)
+        close_neighbours_inv = count_neighbours(self.grid == 2, self.close_kernel)
+
+        far_neighbours_nat = count_neighbours(self.grid == 1, self.far_kernel)
+        far_neighbours_inv = count_neighbours(self.grid == 2, self.far_kernel)
 
         feedback_nat = self.compute_feedback(
             self.pos_factor,

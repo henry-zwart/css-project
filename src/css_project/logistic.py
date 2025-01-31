@@ -35,6 +35,19 @@ def calculate_transition_probabilities(
 
 
 class Logistic(VegetationModel):
+    """Logistic model
+    Attributes:
+        N_NEIGHBOURS (int): Number of neighbours
+        grid (2D np.array): Status of the vegetetation in the grid
+        nutrients (2D np.array): Status of nutrient avaibility in the grid
+        width (int): Width of the grid
+        consume_rate (float): Rate at which nutrients are consumed by vegetation
+        control (float): Nutrient supplement rate
+        random_seed (int): Random seed at each cell in the beginning of simulation
+        alive_prop (float): Proportion of alive cells at the beginning
+        init_method (str): Method to initialize the grid
+    """
+
     N_NEIGHBOURS = kernel.NEIGHBOUR_COUNT_R6.sum()
 
     grid: np.ndarray
@@ -63,6 +76,9 @@ class Logistic(VegetationModel):
         self.supplement_rate = value
 
     def calculate_competition(self, nearby_vegetation: np.ndarray) -> np.ndarray:
+        """
+        Calculate the competition term of the adapted logistic equation. 
+        """
         return 1 - (self.consume_rate * nearby_vegetation) / (
             self.supplement_rate * self.N_NEIGHBOURS
         )
@@ -90,6 +106,20 @@ class Logistic(VegetationModel):
 
 
 class LogisticTwoNative(VegetationModel):
+    """Logistic model including invasive species
+    Attributes:
+        N_NEIGHBOURS (int): Number of neighbours
+        grid (2D np.array): Status of the vegetetation in the grid
+        nutrients (2D np.array): Status of nutrient avaibility in the grid
+        width (int): Width of the grid
+        consume_rate_1 (float): Rate at which nutrients are consumed by native species
+        consume_rate_2 (float): Rate at which nutrients are consumed by invasive species
+        control (float): Nutrient supplement rate
+        species_prop (list): proportion of species at the beginning
+        init_method (str): Method to initialize the grid
+        random_seed (int): Random seed at each cell in the beginning of simulation
+    """
+
     N_NEIGHBOURS = kernel.NEIGHBOUR_COUNT_R6.sum()
 
     grid: np.ndarray
@@ -123,6 +153,10 @@ class LogisticTwoNative(VegetationModel):
     def calculate_competition(
         self, count_species_1: np.ndarray, count_species_2: np.ndarray
     ) -> np.ndarray:
+        """
+        Calculate the competition term of the adapted logistic equation
+        combining the consumption rates of both species. 
+        """
         return 1 - (
             self.consume_rate_1 * count_species_1
             + self.consume_rate_2 * count_species_2

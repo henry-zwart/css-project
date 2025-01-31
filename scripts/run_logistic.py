@@ -1,3 +1,4 @@
+"""Visualise logistic model as animation or image."""
 import argparse
 from pathlib import Path
 
