@@ -163,6 +163,7 @@ class InvasiveVegetation(VegetationModel):
         return np.clip(np.fix(raw_feedback), -1, 1).astype(int)
 
     def update(self):
+        """Simulate one step"""
         close_neighbours_nat = count_neighbours(
             self.grid == 1, self.close_kernel
         )  # correct
