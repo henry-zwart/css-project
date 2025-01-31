@@ -884,7 +884,13 @@ def plot_invasive_model_multiple(
     return
 
 
-def eq_after_inv(width: int, p_nat: float, ctrl_param: float):
+def eq_after_inv(
+    width: int,
+    p_nat: float,
+    ctrl_param: float,
+    n_repeats: int = 5,
+    resolution: int = 100,
+):
     """Creates a plot displaying the presence of the native vegetation
     after introduction of invasive species for the InvasiveVegetation model.
 
@@ -904,9 +910,9 @@ def eq_after_inv(width: int, p_nat: float, ctrl_param: float):
     total_empty = []
 
     count = 0
-    pp_inv = np.linspace(0, 1, 100)
+    pp_inv = np.linspace(0, 1, resolution)
 
-    for _ in range(0, 5):
+    for _ in trange(n_repeats):
         vegetation = InvasiveVegetation(
             width, species_prop=(p_nat, 0), control=ctrl_param
         )
@@ -977,8 +983,4 @@ def eq_after_inv(width: int, p_nat: float, ctrl_param: float):
     axes[2].set_yscale("log")
 
     fig.supxlabel("Initial Proportion of Introduced Invasive Species")
-    plt.savefig(
-        f"results/native_pres_eq_invasive_proportions_ctr={ctrl_param}.png", dpi=300
-    )
-
-    plt.show()
+    return fig
