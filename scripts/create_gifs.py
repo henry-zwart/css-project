@@ -1,11 +1,8 @@
 """Make gifs of the coarse-grained model and the logistic model without
 invasive species for three values of control parameters."""
-import matplotlib.pyplot as plt
-import numpy as np
-from scipy.ndimage import label, sum
 
-from css_project.vegetation import Vegetation
 from css_project.logistic import LogisticTwoNative
+from css_project.vegetation import Vegetation
 from css_project.visualisation import animate_ca
 
 if __name__ == "__main__":
