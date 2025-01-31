@@ -1,3 +1,10 @@
+"""
+Make a figure of the equilibrium density depending on the
+initial probability for multiple control values.
+
+Make a figure of the proportion alive over time for multiple
+initial probabilities. 
+"""
 import numpy as np
 
 from css_project.visualisation import phase_transition_prob
