@@ -9,22 +9,22 @@ def main(width: int, resolution: int, n_repeats: int):
     # Spots
     control = 5
     fig = eq_after_inv(width, p_nat, control, n_repeats, resolution)
-    fig.savefig("invasive_impact_spots.png", dpi=300)
+    fig.savefig("results/invasive_impact_spots.png", dpi=300)
 
     # Labyrinth
     control = 9.5
     fig = eq_after_inv(width, p_nat, control, n_repeats, resolution)
-    fig.savefig("invasive_impact_labyrinth.png", dpi=300)
+    fig.savefig("results/invasive_impact_labyrinth.png", dpi=300)
 
     # Giant component
     control = 10.5
     fig = eq_after_inv(width, p_nat, control, n_repeats, resolution)
-    fig.savefig("invasive_impact_gc.png", dpi=300)
+    fig.savefig("results/invasive_impact_gc.png", dpi=300)
 
     # Dense
     control = 15
     fig = eq_after_inv(width, p_nat, control, n_repeats, resolution)
-    fig.savefig("invasive_impact_dense.png", dpi=300)
+    fig.savefig("results/invasive_impact_dense.png", dpi=300)
 
 
 if __name__ == "__main__":
