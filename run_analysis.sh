@@ -21,8 +21,8 @@ echo "Running species_densities_coarsegrained.py"
 uv run scripts/species_densities_coarsegrained.py $QUICK_OPTION
 echo "Running species_densities_logistic.py"
 uv run scripts/species_densities_logistic.py $QUICK_OPTION
-echo "Running visualise_vegetation.py"
-uv run scripts/visualise_vegetation.py $QUICK_OPTION
-echo "Running visualise_veg_invasive.py"
-uv run scripts/visualise_veg_invasive.py $QUICK_OPTION
+echo "Running create_gifs.py"
+uv run scripts/create_gifs.py $QUICK_OPTION
+echo "Running plot_invasive_impact.py"
+uv run scripts/plot_invasive_impact.py $QUICK_OPTION
 echo "Analysis finished, hooman!"
