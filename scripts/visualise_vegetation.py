@@ -15,7 +15,7 @@ if __name__ == "__main__":
 
     initial_grid = vegetation.grid.copy()
 
-    ani = animate_ca(vegetation, 20)
+    ani = animate_ca(vegetation, 20, 1)
     ani.save("results/vegetation.gif")
 
     vegetation.grid = initial_grid.copy()
