@@ -1,3 +1,5 @@
+"""Make gifs of the coarse-grained model and the logistic model without
+invasive species for three values of control parameters."""
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.ndimage import label, sum

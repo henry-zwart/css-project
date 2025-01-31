@@ -1,3 +1,7 @@
+"""
+Make phase plots for both coarse-grained and logistic model for multiple control
+parameters and initial values.
+"""
 from css_project.logistic import Logistic
 from css_project.vegetation import Vegetation
 from css_project.visualisation import logistic_phase_plot

@@ -25,7 +25,6 @@ QUALITATIVE_COLOURS = [
     "#CCBB44",
     "#228833",
     "#AA3377",
-    # "#FFFFFF",
     "#4477AA",
     "#66CCEE",
     "#EE6677",
@@ -324,6 +323,22 @@ def distribution_leftright_steps(
     init_val: float,
     max_val: float,
 ) -> tuple[int, int]:
+    """
+    Given an initial value in an interval and a total number of steps
+    calculate the amount of steps to the left and to the right that are needed
+    to move from the inital value.
+
+    Args:
+        n_steps: Number of total steps to divide the interval
+        min_val: Minimal value of interval
+        init_val: Starting value
+        max_val: Maximal value of interval
+
+    Returns:
+        Tuple of the amount of steps to the left boundary of the interval 
+        starting from the initial value and the amount of steps to the
+        right boundary.
+    """
     right_range = max_val - init_val
     total_range = max_val - min_val
     right_proportion = right_range / total_range
@@ -344,6 +359,15 @@ def logistic_phase_plot(
     n_repeats: int = 1,
     control_variable_name: str = "Control variable",
 ) -> tuple[Figure, Axes]:
+    """
+    Visualise phase transitions in both a coarse-grained model and logistic model 
+    from an initial control parameter. The model is run until a steady state 
+    before varying the control parameter. The used
+    order parameters are density at equilibrium, cluster ratio, maximum 
+    cluster size and cluster fluctuation.
+
+    Assume that only native species are involved.
+    """
     fig, axes = plt.subplots(
         nrows=3, ncols=1, layout="constrained", figsize=(8, 6), sharex=True
     )
@@ -496,6 +520,13 @@ def invasive_phase_plot(
     iters_per_step: int,
     n_repeats: int = 1,
 ) -> tuple[Figure, Axes]:
+    """
+    Visualise phase transitions in both a coarse-grained model and logistic model 
+    from an initial control parameter. The model is run until a steady state when
+    invasive species are introduced. Then run the model again before varying the 
+    control parameter. The used order parameters are density at equilibrium, 
+    cluster ratio, maximum cluster size and cluster fluctuation.
+    """
     fig, axes = plt.subplots(
         nrows=6, ncols=1, layout="constrained", figsize=(8, 10), sharex=True
     )
@@ -632,3 +663,30 @@ def invasive_phase_plot(
     fig.supxlabel("Nutrient supplementation")
 
     return fig, axes
+
+def animate_phase_transition(
+    model: VegetationModel, control_values: Sequence[float], fps: int = 60
+):
+    """Given a model and a list of control values return an animation of 
+    the states while the control value is being increased and decreased.
+    
+    Returns a Matplotlib Animation object which must be either
+    displayed (plt.show()) or saved (ani.save(FILEPATH)).
+    """
+    fig, ax = plot_grid(model)
+
+    def update_plot(frame):
+        model.set_control(control_values[frame])
+        model.update()
+        ax.set_data(model.grid)
+        return [ax]
+
+    ani = animation.FuncAnimation(
+        fig=fig,
+        func=update_plot,
+        frames=len(control_values),
+        interval=(1000 / fps),
+        repeat=False,
+        blit=True,
+    )
+    return ani
