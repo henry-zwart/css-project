@@ -5,7 +5,7 @@
 Project repository for Vegetation Dynamics using Cellular Automata, a group project
 completed as part of the 2025 Complex Systems Simulation course at UvA. 
 
-See the [associated presentation](CSS\ Group\ 12\ Presentation.pdf).
+See the [associated presentation](presentation.pdf).
 
 **Documentation:** https://henry-zwart.github.io/css-project/
 
@@ -37,7 +37,7 @@ After this completes, the resulting figures are located in `results`.
 We include a `--quick` flag for convenience, which runs the pipeline in a reduced 
 manner. This is effective for verifying code runs successfully, and generates 
 graphs with the correct "shape". However, in order to reproduce the results exactly
-as seen in our [presentation](CSS\ Group\ 12\ Presentation.pdf), you should run the 
+as seen in our [presentation](presentation.pdf), you should run the 
 script without this flag.
 
 ### Running with uv (recommended)
