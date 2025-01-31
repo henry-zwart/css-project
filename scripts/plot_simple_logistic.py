@@ -1,4 +1,5 @@
 """Make an animation of the vegetation over time of the logistic model."""
+
 import argparse
 
 from tqdm import trange
@@ -20,7 +21,7 @@ def main(width: int, frames: int):
 
     # model.introduce_invasive(1.0)
     ani = animate_ca(model, frames, fps=2)
-    ani.save("results/logistic_two_species.mp4")
+    ani.save("results/logistic_two_species.gif")
 
 
 if __name__ == "__main__":
