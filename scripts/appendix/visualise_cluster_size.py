@@ -1,3 +1,5 @@
+"""Visualize the number of vegetation clusters based on size"""
+
 import matplotlib.pyplot as plt
 import numpy as np
 import powerlaw

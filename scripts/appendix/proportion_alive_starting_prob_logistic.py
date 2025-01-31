@@ -1,3 +1,5 @@
+"""Plot the proportion of alive cells over time for the logistic model"""
+
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.pyplot import cm

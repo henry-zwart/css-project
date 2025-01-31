@@ -1,3 +1,5 @@
+"""Plot proportion of alive cells based on control variable"""
+
 import numpy as np
 
 from css_project.visualisation import phase_transition_pos_weight
