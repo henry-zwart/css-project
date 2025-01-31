@@ -1,3 +1,7 @@
+"""
+Make an animation of the state of a model while the control parameter
+is increased and decreased.
+"""
 from collections.abc import Sequence
 
 import matplotlib.animation as animation
@@ -5,30 +9,7 @@ import numpy as np
 
 from css_project.model import VegetationModel
 from css_project.vegetation import Vegetation
-from css_project.visualisation import plot_grid
-
-
-def animate_phase_transition(
-    model: VegetationModel, control_values: Sequence[float], fps: int = 60
-):
-    fig, ax = plot_grid(model)
-
-    def update_plot(frame):
-        model.set_control(control_values[frame])
-        model.update()
-        ax.set_data(model.grid)
-        return [ax]
-
-    ani = animation.FuncAnimation(
-        fig=fig,
-        func=update_plot,
-        frames=len(control_values),
-        interval=(1000 / fps),
-        repeat=False,
-        blit=True,
-    )
-    return ani
-
+from css_project.visualisation import plot_grid, animate_phase_transition
 
 def main():
     WIDTH = 128
@@ -40,9 +21,6 @@ def main():
 
     ani = animate_phase_transition(model, control_values, fps=200)
     ani.save("phase_transition_2.mp4")
-    #
-    # plt.show()
-
 
 if __name__ == "__main__":
     main()
