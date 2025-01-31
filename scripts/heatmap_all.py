@@ -215,7 +215,7 @@ def main():
     WIDTH = 256
 
     positives = np.linspace(start=1, stop=20, num=80)
-    initial_probs = np.logspace(start=-3, stop=0, num=80)
+    initial_probs = np.logspace(start=-6, stop=0, num=80)
 
     fig, phase = make_heatmaps(
         Vegetation,
@@ -229,7 +229,6 @@ def main():
     phase.savefig("results/phaseplot_native_vegetation.png", dpi=500)
 
     nutrient_level = np.linspace(start=0.001, stop=70, num=80)
-    initial_probs = np.logspace(start=-6, stop=0, num=80)
 
     fig, phase = make_heatmaps(
         Logistic,

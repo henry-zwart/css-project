@@ -16,6 +16,6 @@ if __name__ == "__main__":
     for _ in trange(500):
         model.update()
 
-    model.introduce_invasive(1.0)
-    ani = animate_ca(model, 1000, fps=30)
+    # model.introduce_invasive(1.0)
+    ani = animate_ca(model, 20, fps=2)
     ani.save("results/logistic_two_species.mp4")
