@@ -17,6 +17,7 @@ N_NEIGHBOURS = 8
 
 
 def nutrient_diffusion_kernel(rate: float):
+    """Prepare nutrient diffusion kernel for convolution"""
     kernel = np.full(
         (3, 3),
         fill_value=rate / N_NEIGHBOURS,
@@ -27,6 +28,7 @@ def nutrient_diffusion_kernel(rate: float):
 
 
 def neighbour_count_kernel(radius: int = 1) -> np.ndarray:
+    """Prepare activator-inhibotor kernel for convolution"""
     if radius < 1:
         raise ValueError(f"Radius must be at least 1, found: {radius}.")
 

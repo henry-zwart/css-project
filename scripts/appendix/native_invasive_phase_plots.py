@@ -1,3 +1,5 @@
+"""Plot the native/invasive species phaseplot for logistic model"""
+
 from css_project.logistic import LogisticTwoNative
 from css_project.visualisation import invasive_phase_plot
 

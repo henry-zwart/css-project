@@ -1,3 +1,6 @@
+"""Create a heatmap of proportion of alive cells based on control variable
+and initial probability"""
+
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns

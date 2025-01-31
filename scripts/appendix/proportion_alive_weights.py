@@ -1,3 +1,5 @@
+"""Proportion of alive cells based on control variable"""
+
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns

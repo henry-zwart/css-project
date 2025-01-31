@@ -1,3 +1,6 @@
+"""Calculate Kolmogorov complexity for set of initial probabilities
+and control variables"""
+
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns

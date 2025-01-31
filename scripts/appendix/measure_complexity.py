@@ -1,3 +1,5 @@
+"""Calculate cluster statistics and plot"""
+
 from collections.abc import Sequence
 
 import matplotlib.pyplot as plt

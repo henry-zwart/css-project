@@ -190,6 +190,7 @@ class InvasiveVegetation(VegetationModel):
         return np.clip(np.fix(raw_feedback), -1, 1).astype(int)
 
     def update(self):
+
         """Perform a single transition on the grid.
 
         Calculate the feedback for each cell in the grid.

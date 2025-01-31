@@ -12,6 +12,8 @@ CLUSTER_COUNT_STRUCTURE = np.array([[1, 1, 1], [1, 1, 1], [1, 1, 1]], dtype=int)
 
 
 class Compression(StrEnum):
+    """Enumeration over python compression methods"""
+
     ZLIB = "zlib"
     GZIP = "gzip"
     BZ2 = "bz2"
