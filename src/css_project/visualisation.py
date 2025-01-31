@@ -1,3 +1,8 @@
+"""
+This Module Contains several functions to visualise graphs and animations
+for different models.
+"""
+
 import matplotlib.animation as animation
 import matplotlib.colors as mpc
 import matplotlib.pyplot as plt
@@ -99,7 +104,8 @@ def animate_ca(model: VegetationModel, steps: int, fps: int = 5):
     """
     fig, ax = plot_grid(model)
 
-    def update_plot(frame):
+    def update_plot(frame: int):
+        """Updates the model plot for frames higher than zero."""
         if frame == 0:
             ax.set_data(model.grid)
         else:
@@ -143,6 +149,7 @@ def animate_nutrients(ca: FineGrained, steps: int, fps: int = 5):
     fig, ax = plot_nutrients(ca)
 
     def update_plot(_):
+        """Updates the corresponding model plot."""
         ca.update()
         ax.set_data(ca.nutrients)
         return [ax]
@@ -159,9 +166,9 @@ def animate_nutrients(ca: FineGrained, steps: int, fps: int = 5):
     return ani
 
 
-def phase_transition_pos_weight(width, pos_weight_list):
+def phase_transition_pos_weight(width: int, pos_weight_list: list):
     """Creates a plot which calculates the density at equilibrium
-    for a list of positive weights (control).
+    for a list of positive weights (control) and returns a figure.
     """
     alive_list = []
 
@@ -182,7 +189,7 @@ def phase_transition_pos_weight(width, pos_weight_list):
     return fig
 
 
-def phase_transition_prob(width, p_list, pos_weight_list: int | list[int]):
+def phase_transition_prob(width: int, p_list, pos_weight_list: int | list[int]):
     """Creates a plot which calculates the density at equilibrium given
     an initial probability to observe a phase transition.
 
@@ -217,8 +224,6 @@ def phase_transition_prob(width, p_list, pos_weight_list: int | list[int]):
         plt.scatter(p_list, steady_alive_list, label=f"Pos. Weight={pos_weight}")
     plt.legend()
 
-    # Plot of proportion alive cells vs number of iterations for
-    #   multiple starting probabilities
     fig1 = plt.figure(figsize=(8, 6))
 
     num_of_lines = len(p_list)
@@ -237,7 +242,7 @@ def phase_transition_prob(width, p_list, pos_weight_list: int | list[int]):
     return fig1, fig2
 
 
-def densities_invasive_logistic(width, random_seed, p):
+def densities_invasive_logistic(width: int, random_seed, p):
     """Creates a plot for the density of both native and invasive species
     over time in the logistic model. The invasive species is added
     after a steady state is reached."""
@@ -283,9 +288,9 @@ def densities_invasive_logistic(width, random_seed, p):
     return fig1
 
 
-def densities_invasive_coarsegrained(width, p_nat, p_inv):
+def densities_invasive_coarsegrained(width: int, p_nat: float, p_inv: float):
     """Creates a plot for the density of both native and invasive species
-    over time in the coarse-grained model. The invasive species is added
+    over time in the activator-inhibitor model. The invasive species is added
     after a steady state is reached."""
     # Run model until steady state
     native = []
@@ -627,18 +632,12 @@ def invasive_phase_plot(
             equilibrium_variance[repeat, i] = variance_cluster_size(model.grid)
             equilibrium_fluctuation[repeat, i] = fluctuation_cluster_size(model.grid)
 
-    # print(equilibrium_cluster_ratio.mean)
     axes[0].plot(nutrient_vals, equilibrium_density.min(axis=0))
     axes[0].plot(nutrient_vals, equilibrium_density.max(axis=0))
-    # axes[0].scatter(nutrient_vals, equilibrium_density, s=10)
-    #    axes[0].vlines(
-    # init_nutrient, ymin=0, ymax=equilibrium_density.mean(axis=0)[left_steps - 1]
-    # )
     axes[0].set_ylabel("Equilibrium density")
     axes[0].set_ylim(0, 1)
 
     axes[1].plot(nutrient_vals, equilibrium_n_clusters.mean(axis=0))
-    # axes[1].scatter(nutrient_vals, equilibrium_n_clusters, s=10)
     axes[1].vlines(
         init_nutrient, ymin=0, ymax=equilibrium_n_clusters.mean(axis=0)[left_steps - 1]
     )
@@ -646,7 +645,6 @@ def invasive_phase_plot(
     axes[1].set_ylim(0, None)
 
     axes[2].plot(nutrient_vals, equilibrium_cluster_ratio.mean(axis=0))
-    # axes[2].scatter(nutrient_vals, equilibrium_cluster_ratio, s=10)
     axes[2].vlines(
         init_nutrient,
         ymin=0,
@@ -661,10 +659,8 @@ def invasive_phase_plot(
     )
     axes[3].set_ylabel("Giant component")
     axes[3].set_yscale("log")
-    # axes[3].set_ylim(0, 1)
 
     axes[4].plot(nutrient_vals, equilibrium_variance.mean(axis=0))
-    # axes[2].scatter(nutrient_vals, equilibrium_cluster_ratio, s=10)
     axes[4].vlines(
         init_nutrient,
         ymin=0,
@@ -672,10 +668,8 @@ def invasive_phase_plot(
     )
     axes[4].set_ylabel("Cluster size variance")
     axes[4].set_yscale("log")
-    # axes[4].set_ylim(0, None)
 
     axes[5].plot(nutrient_vals, equilibrium_fluctuation.mean(axis=0))
-    # axes[2].scatter(nutrient_vals, equilibrium_cluster_ratio, s=10)
     axes[5].vlines(
         init_nutrient,
         ymin=0,
@@ -683,7 +677,6 @@ def invasive_phase_plot(
     )
     axes[5].set_ylabel("Cluster size fluctuation")
     axes[5].set_yscale("log")
-    # axes[5].set_ylim(0, None)
 
     fig.supxlabel("Nutrient supplementation")
 
