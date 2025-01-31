@@ -3,6 +3,8 @@ This Module Contains several functions to visualise graphs and animations
 for different models.
 """
 
+from collections.abc import Sequence
+
 import matplotlib.animation as animation
 import matplotlib.colors as mpc
 import matplotlib.pyplot as plt
@@ -365,7 +367,7 @@ def distribution_leftright_steps(
         max_val: Maximal value of interval
 
     Returns:
-        Tuple of the amount of steps to the left boundary of the interval 
+        Tuple of the amount of steps to the left boundary of the interval
         starting from the initial value and the amount of steps to the
         right boundary.
     """
@@ -390,10 +392,10 @@ def logistic_phase_plot(
     control_variable_name: str = "Control variable",
 ) -> tuple[Figure, Axes]:
     """
-    Visualise phase transitions in both a coarse-grained model and logistic model 
-    from an initial control parameter. The model is run until a steady state 
+    Visualise phase transitions in both a coarse-grained model and logistic model
+    from an initial control parameter. The model is run until a steady state
     before varying the control parameter. The used
-    order parameters are density at equilibrium, cluster ratio, maximum 
+    order parameters are density at equilibrium, cluster ratio, maximum
     cluster size and cluster fluctuation.
 
     Assume that only native species are involved.
@@ -551,10 +553,10 @@ def invasive_phase_plot(
     n_repeats: int = 1,
 ) -> tuple[Figure, Axes]:
     """
-    Visualise phase transitions in both a coarse-grained model and logistic model 
+    Visualise phase transitions in both a coarse-grained model and logistic model
     from an initial control parameter. The model is run until a steady state when
-    invasive species are introduced. Then run the model again before varying the 
-    control parameter. The used order parameters are density at equilibrium, 
+    invasive species are introduced. Then run the model again before varying the
+    control parameter. The used order parameters are density at equilibrium,
     cluster ratio, maximum cluster size and cluster fluctuation.
     """
     fig, axes = plt.subplots(
@@ -682,12 +684,13 @@ def invasive_phase_plot(
 
     return fig, axes
 
+
 def animate_phase_transition(
     model: VegetationModel, control_values: Sequence[float], fps: int = 60
 ):
-    """Given a model and a list of control values return an animation of 
+    """Given a model and a list of control values return an animation of
     the states while the control value is being increased and decreased.
-    
+
     Returns a Matplotlib Animation object which must be either
     displayed (plt.show()) or saved (ani.save(FILEPATH)).
     """
@@ -708,6 +711,7 @@ def animate_phase_transition(
         blit=True,
     )
     return ani
+
 
 def count_states(alive_nat: list, alive_inv: list, vegetation, total_cells: int):
     """Counts the number of cells in the native and invasive states.
@@ -807,7 +811,7 @@ def plot_invasive_model_multiple(
         plt.xlabel("Time Step")
         plt.ylabel("Proportion of Cells")
         plt.legend(loc="upper right", fontsize="small")
-        plt.savefig("proportion_nat_gradient_eq.png", dpi=300)
+        plt.savefig(f"results/proportion_nat_gradient_eq_p_nat={p_nat}.png", dpi=300)
         plt.show()
 
     elif initial_state == "random":
@@ -869,7 +873,9 @@ def plot_invasive_model_multiple(
         plt.xlabel("Time Step")
         plt.ylabel("Proportion of Cells")
         plt.legend(loc="upper right", fontsize="small")
-        plt.savefig("proportion_nat_gradient_random.png", dpi=300)
+        plt.savefig(
+            f"results/proportion_nat_gradient_random_p_nat={p_nat}.png", dpi=300
+        )
         plt.show()
 
     else:
@@ -971,6 +977,8 @@ def eq_after_inv(width: int, p_nat: float, ctrl_param: float):
     axes[2].set_yscale("log")
 
     fig.supxlabel("Initial Proportion of Introduced Invasive Species")
-    plt.savefig("native_pres_eq_invasive_proportions.png", dpi=300)
+    plt.savefig(
+        f"results/native_pres_eq_invasive_proportions_ctr={ctrl_param}.png", dpi=300
+    )
 
     plt.show()
