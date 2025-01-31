@@ -4,7 +4,6 @@ import numpy as np
 
 from css_project.complexity import (
     count_clusters,
-    fluctuation_cluster_size,
     maximum_cluster_size,
 )
 from css_project.vegetation import InvasiveVegetation
@@ -243,12 +242,13 @@ def run_model_multiple(
     return
 
 
-def run_new_model(width, p_nat, p_inv):
-    vegetation = InvasiveVegetation(width, species_prop=(p_nat, 0))
+def run_new_model(width, p_nat, p_inv, c):
+    vegetation = InvasiveVegetation(width, species_prop=(p_nat, 0.0), control=c)
+    # ani = animate_ca(vegetation, 100)
     vegetation.run()
 
     vegetation.introduce_invasive(p_inv)
-    ani = animate_ca(vegetation, 200, fps=25)
+    ani = animate_ca(vegetation, 40, fps=5)
     ani.save("vegetation_new.gif")
 
 
@@ -257,10 +257,9 @@ def eq_after_inv_cluster_plots(
     density_after,
     equilibrium_cluster_count,
     equilibrium_max_cluster,
-    equilibrium_fluctuation,
 ):
     fig, axes = plt.subplots(
-        nrows=4, ncols=1, layout="constrained", figsize=(8, 10), sharex=True
+        nrows=3, ncols=1, layout="constrained", figsize=(8, 10), sharex=True
     )
     # Plots the equilibrium density after introduction of invasive species
     axes[0].plot(pp_inv, density_after)
@@ -269,48 +268,44 @@ def eq_after_inv_cluster_plots(
 
     # Plots the cluster count after introduction of invasive species
     axes[1].plot(pp_inv, equilibrium_cluster_count)
-    axes[1].vlines(pp_inv, ymin=0, ymax=equilibrium_cluster_count)
+    # axes[1].vlines(pp_inv, ymin=0, ymax=equilibrium_cluster_count)
     axes[1].set_ylabel("Cluster Count")
     axes[1].set_ylim(0, None)
 
     # Plots the Giant component after introduction of invasive species
     axes[2].plot(pp_inv, equilibrium_max_cluster)
-    axes[2].vlines(pp_inv, ymin=0, ymax=equilibrium_max_cluster)
+    # axes[2].vlines(pp_inv, ymin=0, ymax=equilibrium_max_cluster)
     axes[2].set_ylabel("Giant Component")
     axes[2].set_yscale("log")
 
-    # Plots the fluctuation of the cluster sizes after introduction
-    # of invasive species
-    axes[3].plot(pp_inv, equilibrium_fluctuation)
-    axes[3].vlines(pp_inv, ymin=0, ymax=equilibrium_fluctuation)
-    axes[3].set_ylabel("Cluster size fluctuation")
-    axes[3].set_yscale("log")
-
-    fig.supxlabel("Introduced Proportion ofInvasive Species on Dead Cells ")
+    fig.supxlabel("Initial Proportion of Introduced Invasive Species")
+    plt.savefig("native_pres_eq_invasive_proportions.png", dpi=300)
 
     plt.show()
 
     return
 
 
-def eq_after_inv(width, p_nat):
+def eq_after_inv(width, p_nat, c):
     density_after = []
     density_after_list = []
     equilibrium_max_cluster = []
     equilibrium_max_cluster_list = []
-    equilibrium_fluctuation = []
-    equilibrium_fluctuation_list = []
     equilibrium_cluster_count = []
     equilibrium_cluster_count_list = []
+    total_empty = []
 
     count = 0
     pp_inv = np.linspace(0, 1, 100)
 
     for _ in range(0, 5):
-        vegetation = InvasiveVegetation(width, species_prop=(p_nat, 0))
+        vegetation = InvasiveVegetation(width, species_prop=(p_nat, 0), control=c)
         vegetation.run()
         initial_grid = vegetation.grid.copy()
         total_cells = vegetation.area
+        total_empty.append(
+            (vegetation.area - vegetation.total_alive()) / vegetation.area
+        )
 
         for p_inv in pp_inv:
             # Introduce invasive
@@ -318,12 +313,11 @@ def eq_after_inv(width, p_nat):
             print("Count: ", count)
 
             vegetation.introduce_invasive(p_inv)
-            vegetation.run(iterations=500)
+            vegetation.run(iterations=300)
 
             density_after.append(vegetation.species_alive()[0] / total_cells)
             equilibrium_cluster_count.append(count_clusters(vegetation.grid))
             equilibrium_max_cluster.append(maximum_cluster_size(vegetation.grid))
-            equilibrium_fluctuation.append(fluctuation_cluster_size(vegetation.grid))
 
             vegetation.grid = initial_grid.copy()
 
@@ -336,9 +330,6 @@ def eq_after_inv(width, p_nat):
         equilibrium_max_cluster_list.append(equilibrium_max_cluster)
         equilibrium_max_cluster = []
 
-        equilibrium_fluctuation_list.append(equilibrium_fluctuation)
-        equilibrium_fluctuation = []
-
     density_after_list = np.asarray(density_after_list)
     density_after_avg = density_after_list.mean(axis=0)
 
@@ -348,15 +339,15 @@ def eq_after_inv(width, p_nat):
     equilibrium_max_cluster_list = np.asarray(equilibrium_max_cluster_list)
     equilibrium_max_cluster_avg = equilibrium_max_cluster_list.mean(axis=0)
 
-    equilibrium_fluctuation_list = np.asarray(equilibrium_fluctuation_list)
-    equilibrium_fluctuation_avg = equilibrium_fluctuation_list.mean(axis=0)
+    total_empty = np.asarray(total_empty)
+    total_empty_avg = total_empty.mean(axis=0)
+    p_inv_avg = pp_inv * total_empty_avg
 
     eq_after_inv_cluster_plots(
-        pp_inv,
+        p_inv_avg,
         density_after_avg,
         equilibrium_cluster_count_avg,
         equilibrium_max_cluster_avg,
-        equilibrium_fluctuation_avg,
     )
 
 
@@ -364,16 +355,17 @@ if __name__ == "__main__":
     timespan = 20
     width = 128
     p_nat = 0.25
-    p_inv = 0.85
+    control = 7
+    p_inv = 0.60
 
-    run_new_model(width, p_nat, p_inv)
+    run_new_model(width, p_nat, p_inv, control)
 
     # vegetation = InvasiveVegetation(width, species_prop=(p_nat, 0))
     # vegetation.run(iterations=2)
     # vegetation.introduce_invasive(p_inv)
     # vegetation.run(iterations=1)
 
-    # eq_after_inv(width, p_nat)
+    eq_after_inv(width, p_nat, control)
 
     # runs = 5
     # run_new_model(width, species_prop=(0.25, 0.25))
