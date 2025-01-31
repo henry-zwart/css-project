@@ -365,7 +365,7 @@ if __name__ == "__main__":
     # vegetation.introduce_invasive(p_inv)
     # vegetation.run(iterations=1)
 
-    # eq_after_inv(width, p_nat, control)
+    eq_after_inv(width, p_nat, control)
 
     # runs = 5
     # run_new_model(width, species_prop=(0.25, 0.25))

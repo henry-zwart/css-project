@@ -708,3 +708,269 @@ def animate_phase_transition(
         blit=True,
     )
     return ani
+
+def count_states(alive_nat: list, alive_inv: list, vegetation, total_cells: int):
+    """Counts the number of cells in the native and invasive states.
+    Adds the number to a list for the respective states and returns
+    the list."""
+    alive_n, alive_i = vegetation.species_alive()
+    alive_nat.append(alive_n / total_cells)
+    alive_inv.append(alive_i / total_cells)
+
+    return alive_nat, alive_inv
+
+
+def plot_invasive_model_multiple(
+    width: int,
+    p_nat: float,
+    pp_inv: float,
+    timespan: int = 40,
+    initial_state: str = "equilibrium",
+    t_eq: int = 30,
+    inv_type: str = "empty",
+):
+    """This Code runs the invasive model multiple times to plot the
+    proportion of native species over time for different introduced
+    proportions of invasive.
+
+    Args:
+        width: The number of cells in one side of the grid.
+        p_nat: Initial proportion of native species.
+        p_inv: Initial proportion of invasive species.
+        timespan: Number of iterations/amount of time to obtain data.
+        initial_state: The specific state in which the native species
+            finds itself.
+        t_eq: Time to run the updates until equilibrium.
+        inv_type: How we introduce invasive species. Assumes only one
+            empty cells."""
+    if initial_state == "equilibrium":
+        vegetation = InvasiveVegetation(width, species_prop=(p_nat, 0.0))
+
+        t = 0
+        total_cells = vegetation.width * vegetation.width
+
+        while t < t_eq:
+            vegetation.update()
+            t += 1
+
+        # Copy grid to save initial state before invasive species introduction
+        initial_grid = vegetation.grid.copy()
+
+        alive_nat_tot = []
+        alive_inv_tot = []
+        alive_nat = []
+        alive_inv = []
+
+        for p_inv in pp_inv:
+            # Introduce invasive species
+            alive_nat, alive_inv = count_states(
+                alive_nat, alive_inv, vegetation, total_cells
+            )
+            vegetation.introduce_invasive(p_inv, inv_type)
+            alive_nat, alive_inv = count_states(
+                alive_nat, alive_inv, vegetation, total_cells
+            )
+
+            t = 0
+            while t < timespan:
+                vegetation.update()
+                alive_nat, alive_inv = count_states(
+                    alive_nat, alive_inv, vegetation, total_cells
+                )
+                t += 1
+
+            # Save proportions for run
+            alive_nat_tot.append(alive_nat[:])
+            alive_inv_tot.append(alive_inv[:])
+
+            # Reset
+            vegetation.grid = initial_grid.copy()
+            t = 0
+            alive_nat = []
+            alive_inv = []
+
+        # Plotting
+        plt.figure(figsize=(10, 8))
+        colors = cm.viridis(np.linspace(0, 1, len(pp_inv)))
+
+        for i, (p_inv, color) in enumerate(zip(pp_inv, colors, strict=False)):
+            iterations = list(range(len(alive_nat_tot[i])))
+            plt.plot(
+                iterations,
+                alive_nat_tot[i],
+                color=color,
+                label=f"Native (p_inv={p_inv})",
+                linestyle="-",
+            )
+
+        plt.title("Proportion of Native Species for different p_inv")
+        plt.xlabel("Time Step")
+        plt.ylabel("Proportion of Cells")
+        plt.legend(loc="upper right", fontsize="small")
+        plt.savefig("proportion_nat_gradient_eq.png", dpi=300)
+        plt.show()
+
+    elif initial_state == "random":
+        vegetation = InvasiveVegetation(width, species_prop=(0.25, 0.25))
+        t = 0
+        total_cells = vegetation.width * vegetation.width
+
+        # Copy grid to save initial state
+        initial_grid = vegetation.grid.copy()
+
+        alive_nat_tot = []
+        alive_inv_tot = []
+        alive_nat = []
+        alive_inv = []
+
+        for p_inv in pp_inv:
+            # Introduce invasive species
+            alive_nat, alive_inv = count_states(
+                alive_nat, alive_inv, vegetation, total_cells
+            )
+            vegetation.introduce_invasive(p_inv, inv_type)
+            alive_nat, alive_inv = count_states(
+                alive_nat, alive_inv, vegetation, total_cells
+            )
+
+            t = 0
+            while t < timespan:
+                vegetation.update()
+                alive_nat, alive_inv = count_states(
+                    alive_nat, alive_inv, vegetation, total_cells
+                )
+                t += 1
+
+            # Save proportions for run
+            alive_nat_tot.append(alive_nat[:])
+            alive_inv_tot.append(alive_inv[:])
+
+            # Reset
+            vegetation.grid = initial_grid.copy()
+            t = 0
+            alive_nat = []
+            alive_inv = []
+
+        # Plotting
+        plt.figure(figsize=(10, 8))
+        colors = cm.viridis(np.linspace(0, 1, len(pp_inv)))
+
+        for i, (p_inv, color) in enumerate(zip(pp_inv, colors, strict=False)):
+            iterations = list(range(len(alive_nat_tot[i])))
+            plt.plot(
+                iterations,
+                alive_nat_tot[i],
+                color=color,
+                label=f"Native (p_inv={p_inv})",
+                linestyle="-",
+            )
+
+        plt.title("Proportion of Native Species for different p_inv")
+        plt.xlabel("Time Step")
+        plt.ylabel("Proportion of Cells")
+        plt.legend(loc="upper right", fontsize="small")
+        plt.savefig("proportion_nat_gradient_random.png", dpi=300)
+        plt.show()
+
+    else:
+        raise ValueError("Inapropriate initial state type passed.")
+
+    return
+
+
+def eq_after_inv(width: int, p_nat: float, ctrl_param: float):
+    """Creates a plot displaying the presence of the native vegetation
+    after introduction of invasive species for the InvasiveVegetation model.
+
+    Args:
+        width: The number of cells in one side of the cellular automata grid.
+        p_nat: The initial proportion of native species.
+        ctrl_param: The control paramater (positive feedback), set for both species.
+
+    Returns:
+        Nothing, a graph is saved and shown."""
+    density_after = []
+    density_after_list = []
+    equilibrium_max_cluster = []
+    equilibrium_max_cluster_list = []
+    equilibrium_cluster_count = []
+    equilibrium_cluster_count_list = []
+    total_empty = []
+
+    count = 0
+    pp_inv = np.linspace(0, 1, 100)
+
+    for _ in range(0, 5):
+        vegetation = InvasiveVegetation(
+            width, species_prop=(p_nat, 0), control=ctrl_param
+        )
+        vegetation.run()
+        initial_grid = vegetation.grid.copy()
+        total_cells = vegetation.area
+        total_empty.append(
+            (vegetation.area - vegetation.total_alive()) / vegetation.area
+        )
+
+        for p_inv in pp_inv:
+            # Introduce invasive
+            count += 1
+
+            # Introduces invasive species
+            vegetation.introduce_invasive(p_inv)
+            vegetation.run(iterations=300)
+
+            # Calculates and obtains plotted data
+            density_after.append(vegetation.species_alive()[0] / total_cells)
+            equilibrium_cluster_count.append(count_clusters(vegetation.grid))
+            equilibrium_max_cluster.append(maximum_cluster_size(vegetation.grid))
+
+            # Resets the grid to it's initial state
+            vegetation.grid = initial_grid.copy()
+
+        # Appends and resets values to the corresponding lists
+        density_after_list.append(density_after)
+        density_after = []
+
+        equilibrium_cluster_count_list.append(equilibrium_cluster_count)
+        equilibrium_cluster_count = []
+
+        equilibrium_max_cluster_list.append(equilibrium_max_cluster)
+        equilibrium_max_cluster = []
+
+    # Initialises the lists as arrays for mean calculations
+    density_after_list = np.asarray(density_after_list)
+    density_after_avg = density_after_list.mean(axis=0)
+
+    equilibrium_cluster_count_list = np.asarray(equilibrium_cluster_count_list)
+    equilibrium_cluster_count_avg = equilibrium_cluster_count_list.mean(axis=0)
+
+    equilibrium_max_cluster_list = np.asarray(equilibrium_max_cluster_list)
+    equilibrium_max_cluster_avg = equilibrium_max_cluster_list.mean(axis=0)
+
+    total_empty = np.asarray(total_empty)
+    total_empty_avg = total_empty.mean(axis=0)
+    p_inv_avg = pp_inv * total_empty_avg
+
+    # Make the plots
+    fig, axes = plt.subplots(
+        nrows=3, ncols=1, layout="constrained", figsize=(8, 10), sharex=True
+    )
+    # Plots the equilibrium density after introduction of invasive species
+    axes[0].plot(p_inv_avg, density_after_avg)
+    axes[0].set_ylabel("Equilibrium Density")
+    axes[0].set_ylim(0, max(density_after_avg) + 0.01)
+
+    # Plots the cluster count after introduction of invasive species
+    axes[1].plot(p_inv_avg, equilibrium_cluster_count_avg)
+    axes[1].set_ylabel("Cluster Count")
+    axes[1].set_ylim(0, None)
+
+    # Plots the Giant component after introduction of invasive species
+    axes[2].plot(p_inv_avg, equilibrium_max_cluster_avg)
+    axes[2].set_ylabel("Giant Component")
+    axes[2].set_yscale("log")
+
+    fig.supxlabel("Initial Proportion of Introduced Invasive Species")
+    plt.savefig("native_pres_eq_invasive_proportions.png", dpi=300)
+
+    plt.show()
