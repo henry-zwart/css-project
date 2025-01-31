@@ -20,7 +20,7 @@ def main(width: int, frames_logistic: int):
             vegetation = Vegetation(width, control=pos)
             vegetation.initial_grid(p=0.3)
 
-            ani = animate_ca(vegetation, 10)
+            ani = animate_ca(vegetation, 60)
             ani.save(f"results/activator_inhibitor_control_{pos}.gif")
             prog.update()
 
@@ -38,7 +38,7 @@ def main(width: int, frames_logistic: int):
 
 if __name__ == "__main__":
     WIDTH = 64
-    QUICK_FRAMES_LOGISTIC = 10
+    QUICK_FRAMES_LOGISTIC = 100
     FULL_FRAMES_LOGISTIC = 1000
 
     parser = argparse.ArgumentParser(
