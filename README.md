@@ -4,6 +4,8 @@
 
 **Documentation:** https://henry-zwart.github.io/css-project/
 
+**Project Board:** https://github.com/users/henry-zwart/projects/1
+
 **Small bonuses:** 
 - Our code handles edge cases and invalid parameters.
 - Our "pytest" works and succeeds.
