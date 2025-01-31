@@ -2,10 +2,8 @@
 
 [![Tests](https://github.com/henry-zwart/css-project/actions/workflows/test.yml/badge.svg)](https://github.com/henry-zwart/css-project/actions/workflows/test.yml)
 
-Project repository for Vegetation Dynamics using Cellular Automata, a group project
-completed as part of the 2025 Complex Systems Simulation course at UvA. 
-
-See the [associated presentation](presentation.pdf).
+Project repository for [Vegetation Dynamics using Cellular Automata](presentation.pdf), a 
+group project completed as part of the 2025 Complex Systems Simulation course at UvA. 
 
 **Documentation:** https://henry-zwart.github.io/css-project/
 
