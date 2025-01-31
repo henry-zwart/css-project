@@ -6,6 +6,27 @@ from . import kernel
 
 
 class FineGrained:
+    """Fine grained model with nutrient diffusion
+    Attributes:
+        N_STATES (int): Number of states a cell can be int
+        N_STATES (int): Number of neighbours
+        rng (int): Random seed
+        grid (2D np.array): Status of the vegetetation in the grid
+        width (int): Width of the grid
+        area (int): Total number of cells in the grid
+        nutrients (2D np.array): Status of nutrient avaibility in the grid
+        plant_matter (2D np.array): Status of nutrients present in vegetation
+        compost (2D np.array): Status of decomposing matter in the grid
+        nutrient_level (float): Amount of nutrient present
+            at each cell in the beginning of simulation
+        nutrient_consume_rate (float): Rate at which nutrients are consumed
+            by vegetation
+        nutrient_regenerate_rate (float): Rate at which nutrients are recovered
+        nutrient_diffusion_kernel (object): Kernel to be used for simulation
+        proportion_alive_list (list): Stores number of alive cells at each step
+        original_grid (2D np.array): Copy of initial grid
+    """
+
     N_STATES = 2
     N_NEIGHBOURS = 8
 
@@ -56,6 +77,7 @@ class FineGrained:
         self.original_grid = self.grid.copy()
 
     def reset(self):
+        """Resets grid to original configuration"""
         self.grid = self.original_grid.copy()
         self.nutrients = (
             np.zeros_like(self.grid, dtype=np.float64) + self.nutrient_level
@@ -89,6 +111,7 @@ class FineGrained:
         return False
 
     def find_steady_state(self, iterations):
+        """Run simulation until steady state is reached"""
         for _ in range(iterations):
             if self.is_steady_state():
                 break
@@ -135,6 +158,7 @@ class FineGrained:
         self.proportion_alive_list.append(self.total_alive() / self.area)
 
     def diffuse_nutrients(self):
+        """Diffuse nutrients across the grid"""
         total_nutrients_before = self.nutrients.sum()
         self.nutrients = signal.convolve2d(
             self.nutrients, self.nutrient_diffusion_kernel, mode="same", boundary="fill"
@@ -144,6 +168,7 @@ class FineGrained:
         self.nutrients += nutrients_lost / self.width**2
 
     def system_nutrients(self):
+        "Return the total amount of nutrients in the system"
         return self.nutrients.sum() + self.plant_matter.sum() + self.compost.sum()
 
 

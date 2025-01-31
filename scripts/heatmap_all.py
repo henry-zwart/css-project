@@ -215,7 +215,7 @@ def main():
     WIDTH = 256
 
     positives = np.linspace(start=1, stop=20, num=80)
-    initial_probs = np.logspace(start=-3, stop=0, num=80)
+    initial_probs = np.logspace(start=-6, stop=0, num=80)
 
     fig, phase = make_heatmaps(
         Vegetation,
