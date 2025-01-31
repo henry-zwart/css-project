@@ -4,6 +4,12 @@
 
 **Documentation:** https://henry-zwart.github.io/css-project/
 
+**Small bonuses:** 
+- Our code handles edge cases and invalid paramters.
+- Our "pytest" works and succeeds.
+- Our code is structured as a module.
+- Documentation generated from docstrings (see link above)
+
 ## Development - Getting started
 
 This repository uses _uv_ to manage Python and its dependencies, and _pre-commit_ to run
