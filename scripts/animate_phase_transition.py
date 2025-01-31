@@ -2,14 +2,12 @@
 Make an animation of the state of a model while the control parameter
 is increased and decreased.
 """
-from collections.abc import Sequence
 
-import matplotlib.animation as animation
 import numpy as np
 
-from css_project.model import VegetationModel
 from css_project.vegetation import Vegetation
-from css_project.visualisation import plot_grid, animate_phase_transition
+from css_project.visualisation import animate_phase_transition
+
 
 def main():
     WIDTH = 128
@@ -20,7 +18,8 @@ def main():
     model.run(1000)
 
     ani = animate_phase_transition(model, control_values, fps=200)
-    ani.save("phase_transition_2.mp4")
+    ani.save("results/phase_transition_2.gif")
+
 
 if __name__ == "__main__":
     main()
